@@ -1,7 +1,7 @@
 import { CssBaseline } from "@mui/material";
 import { Switch, Route } from "react-router-dom";
 
-import Register from "features/registration/Register";
+import Register from "features/auth/Register";
 
 export default function App() {
   return (
