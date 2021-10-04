@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
@@ -10,6 +11,8 @@ import theme from "app/theme";
 import "common/utils/firebase.util";
 
 import reportWebVitals from "./reportWebVitals";
+
+axios.defaults.baseURL = "/api/v1";
 
 ReactDOM.render(
   <React.StrictMode>
