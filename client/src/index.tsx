@@ -6,6 +6,9 @@ import { BrowserRouter as Router } from "react-router-dom";
 import App from "app/App";
 import theme from "app/theme";
 
+// initialize firebase web sdk
+import "common/utils/firebase.util";
+
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
