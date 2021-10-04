@@ -5,6 +5,7 @@
 1. Clone repo and run `docker-compose up`
 1. Visit [localhost:3000](http://localhost:3000) to start developing for the frontend
 1. API gateway runs on `localhost:5000` by default
+1. User management portal for dev can be accessed at [http://localhost:9098/auth](http://localhost:9098/auth)
 
 ## How to install npm packages
 1. To install additional node modules to the frontend, first run the command below to access the container shell
