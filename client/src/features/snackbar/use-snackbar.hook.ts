@@ -25,7 +25,7 @@ export function useSnackbar() {
       dispatch(shiftSnackpack());
       dispatch(setOpen(true));
     }
-  }, [snackPack, messageInfo, isOpen]);
+  }, [snackPack, messageInfo, isOpen, dispatch]);
 
   const open = (options: SnackbarMessage) => {
     const newMessage: SnackbarMessage = {

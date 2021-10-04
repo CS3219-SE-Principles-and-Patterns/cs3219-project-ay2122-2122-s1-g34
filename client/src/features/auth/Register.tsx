@@ -7,8 +7,17 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import { signInWithCustomToken } from "firebase/auth";
 import { useFormik } from "formik";
+import { Redirect } from "react-router-dom";
 import * as yup from "yup";
+
+import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
+import { auth } from "common/utils/firebase.util";
+
+import { mapUserData } from "features/auth/map-user-data.util";
+import { selectUser, setUserData } from "features/auth/user.slice";
+import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 const validationSchema = yup.object({
   displayName: yup.string().required("Name is required"),
@@ -26,6 +35,10 @@ const validationSchema = yup.object({
 });
 
 export default function Register() {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const { open } = useSnackbar();
+
   const formik = useFormik({
     initialValues: {
       displayName: "",
@@ -40,6 +53,17 @@ export default function Register() {
           displayName: values.displayName,
           email: values.email,
           password: values.password1,
+        } as any);
+
+        const customToken = response.data.token;
+        const userCredential = await signInWithCustomToken(auth, customToken);
+
+        const userData = await mapUserData(userCredential.user);
+        dispatch(setUserData(userData));
+
+        open({
+          message:
+            "Account created! You are now signed in to your new account!",
         });
       } catch (e: any) {
         if (e?.response?.data?.message) {
@@ -54,7 +78,13 @@ export default function Register() {
     },
   });
 
-  return (
+  return !!user ? (
+    <Redirect
+      to={{
+        pathname: "/",
+      }}
+    />
+  ) : (
     <Container maxWidth="xs">
       <Box
         sx={{

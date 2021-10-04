@@ -40,8 +40,11 @@ export const userSlice = createSlice({
   name: "user",
   initialState: initialState as UserData | false,
   reducers: {
-    setUserData: (_, action: PayloadAction<UserData>) => {
-      setUserStorage(action.payload);
+    setUserData: (_, action: PayloadAction<UserData | false>) => {
+      if (action.payload) {
+        setUserStorage(action.payload);
+      }
+      
       return action.payload;
     },
   },
