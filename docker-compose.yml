@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  client:
+    image: node:14-alpine
+    command: sh -c "yarn install && yarn start"
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./client:/app
