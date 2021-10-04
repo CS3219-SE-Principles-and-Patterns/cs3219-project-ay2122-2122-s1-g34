@@ -6,6 +6,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
@@ -33,8 +34,23 @@ export default function Register() {
       password2: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: async (values, { setFieldError }) => {
+      try {
+        const response = await axios.post("/users", {
+          displayName: values.displayName,
+          email: values.email,
+          password: values.password1,
+        });
+      } catch (e: any) {
+        if (e?.response?.data?.message) {
+          Object.entries(e.response.data.message).forEach(
+            ([property, value]) => {
+              setFieldError(property, value as string);
+            }
+          );
+        } else {
+        }
+      }
     },
   });
 
