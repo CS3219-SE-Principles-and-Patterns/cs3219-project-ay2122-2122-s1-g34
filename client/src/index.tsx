@@ -2,9 +2,11 @@ import { ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import React from "react";
 import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import App from "app/App";
+import { store } from "app/store";
 import theme from "app/theme";
 
 // initialize firebase web sdk
@@ -16,11 +18,13 @@ axios.defaults.baseURL = "/api/v1";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <ThemeProvider theme={theme}>
-        <App />
-      </ThemeProvider>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <ThemeProvider theme={theme}>
+          <App />
+        </ThemeProvider>
+      </Router>
+    </Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );
