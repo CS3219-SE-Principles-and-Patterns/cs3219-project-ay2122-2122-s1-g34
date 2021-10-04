@@ -15,6 +15,9 @@ services:
     command: sh -c "yarn install && yarn start:dev"
     ports:
       - 5000:5000
+      - 9005:9005
+      - 9098:9098
+      - 9099:9099
     working_dir: /app
     volumes:
       - ./api-gateway:/app
