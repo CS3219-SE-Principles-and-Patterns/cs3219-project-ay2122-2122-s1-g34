@@ -1,0 +1,11 @@
+{
+  "importOrder": [
+    "^app/(.*)$",
+    "^common/(.*)$",
+    "^features/(.*)$",
+    "^pages/(.*)$",
+    "^public/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true
+}
