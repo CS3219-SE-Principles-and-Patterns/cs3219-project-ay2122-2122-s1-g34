@@ -12,7 +12,7 @@ services:
 
   api-gateway:
     image: node:14-alpine
-    command: sh -c "yarn install && yarn start:dev"
+    command: sh -c "yarn install && yarn start:dev & npx firebase emulators:start --import=./firebase-emulator-data --export-on-exit"
     ports:
       - 5000:5000
       - 9005:9005
@@ -22,6 +22,7 @@ services:
     volumes:
       - ./api-gateway:/app
     environment:
+       FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
        NODE_ENV: development
        PORT: 5000
 
