@@ -1,7 +1,6 @@
 import { LoadingButton } from "@mui/lab";
 import { Box, Container, Grid, TextField, Typography } from "@mui/material";
-import axios from "axios";
-import { signInWithCustomToken } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useFormik } from "formik";
 import { Redirect } from "react-router-dom";
 import * as yup from "yup";
@@ -14,64 +13,44 @@ import { selectUser, setUserData } from "features/auth/user.slice";
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 const validationSchema = yup.object({
-  displayName: yup.string().required("Name is required"),
   email: yup
     .string()
     .email("Enter a valid email")
     .required("Email is required"),
-  password1: yup
-    .string()
-    .min(6, "Password should be of minimum 6 characters length")
-    .required("Password is required"),
-  password2: yup
-    .string()
-    .oneOf([yup.ref("password1"), null], "Passwords must match"),
+  password: yup.string().required("Password is required"),
 });
 
-export default function Register() {
+export default function Login() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const { open } = useSnackbar();
 
   const formik = useFormik({
     initialValues: {
-      displayName: "",
       email: "",
-      password1: "",
-      password2: "",
+      password: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { setFieldError }) => {
       try {
-        const response = await axios.post("/users", {
-          displayName: values.displayName,
-          email: values.email,
-          password: values.password1,
-        } as any);
-
-        const customToken = response.data.token;
-        const userCredential = await signInWithCustomToken(auth, customToken);
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          values.email,
+          values.password
+        );
 
         const userData = await mapUserData(userCredential.user);
         dispatch(setUserData(userData));
 
         open({
-          message:
-            "Account created! You are now signed in to your new account!",
+          message: "Login successful!",
         });
-      } catch (e: any) {
-        if (e?.response?.data?.message) {
-          Object.entries(e.response.data.message).forEach(
-            ([property, value]) => {
-              setFieldError(property, value as string);
-            }
-          );
-        } else {
-          open({
-            message: "An unspecified error has occurred. Please try again.",
-            severity: "error",
-          });
-        }
+      } catch {
+        setFieldError("email", "Invalid email or password. Please try again.");
+        setFieldError(
+          "password",
+          "Invalid email or password. Please try again."
+        );
       }
     },
   });
@@ -99,30 +78,10 @@ export default function Register() {
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
-          Get started with PeerPrep
+          Login to PeerPrep
         </Typography>
-        <Typography>Prepare for technical questions with peers</Typography>
         <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Enter your name"
-                autoFocus
-                name="displayName"
-                value={formik.values.displayName}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.displayName &&
-                  Boolean(formik.errors.displayName)
-                }
-                helperText={
-                  formik.touched.displayName && formik.errors.displayName
-                }
-                disabled={formik.isSubmitting}
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 required
@@ -144,29 +103,13 @@ export default function Register() {
                 label="Enter your password"
                 type="password"
                 autoComplete="new-password"
-                name="password1"
-                value={formik.values.password1}
+                name="password"
+                value={formik.values.password}
                 onChange={formik.handleChange}
                 error={
-                  formik.touched.password1 && Boolean(formik.errors.password1)
+                  formik.touched.password && Boolean(formik.errors.password)
                 }
-                helperText={formik.touched.password1 && formik.errors.password1}
-                disabled={formik.isSubmitting}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Confirm password"
-                type="password"
-                name="password2"
-                value={formik.values.password2}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.password2 && Boolean(formik.errors.password2)
-                }
-                helperText={formik.touched.password2 && formik.errors.password2}
+                helperText={formik.touched.password && formik.errors.password}
                 disabled={formik.isSubmitting}
               />
             </Grid>
@@ -175,11 +118,11 @@ export default function Register() {
             type="submit"
             fullWidth
             variant="contained"
-            color="warning"
+            color="success"
             sx={{ mt: 3, mb: 2 }}
             loading={formik.isSubmitting}
           >
-            Sign Up
+            Log In
           </LoadingButton>
         </Box>
       </Box>
