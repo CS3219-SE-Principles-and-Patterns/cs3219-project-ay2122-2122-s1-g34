@@ -1,6 +1,7 @@
 {
-  "name": "api-gateway",
+  "name": "nest-typescript-starter",
   "version": "1.0.0",
+  "description": "Nest TypeScript starter repository",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
@@ -15,43 +16,34 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./e2e/jest-e2e.json"
+    "test:e2e": "echo 'No e2e tests implemented yet.'"
   },
   "dependencies": {
-    "@nestjs/common": "8.0.9",
-    "@nestjs/config": "^1.0.1",
-    "@nestjs/core": "8.0.9",
-    "@nestjs/mapped-types": "*",
-    "@nestjs/platform-express": "8.0.9",
-    "@nestjs/platform-socket.io": "^8.0.11",
-    "@nestjs/swagger": "^5.1.0",
-    "@nestjs/websockets": "^8.0.11",
+    "@nestjs/common": "8.0.11",
+    "@nestjs/core": "8.0.11",
+    "@nestjs/microservices": "8.0.11",
+    "@nestjs/platform-express": "8.0.11",
     "class-transformer": "0.4.0",
     "class-validator": "0.13.1",
-    "firebase-admin": "^9.12.0",
-    "lib0": "^0.2.42",
+    "nats": "^2.2.0",
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
-    "rxjs": "7.3.1",
-    "swagger-ui-express": "^4.1.6",
-    "y-protocols": "^1.0.5",
-    "yjs": "^13.5.13"
+    "rxjs": "7.4.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "latest",
+    "@nestjs/cli": "8.1.2",
     "@nestjs/schematics": "8.0.3",
-    "@nestjs/testing": "8.0.9",
+    "@nestjs/testing": "8.0.11",
     "@trivago/prettier-plugin-sort-imports": "^2.0.4",
+    "@types/amqplib": "0.8.2",
     "@types/express": "4.17.13",
-    "@types/jest": "27.0.2",
-    "@types/node": "14.17.20",
+    "@types/node": "14.17.21",
     "@types/supertest": "2.0.11",
-    "@typescript-eslint/eslint-plugin": "4.32.0",
-    "@typescript-eslint/parser": "4.32.0",
+    "@typescript-eslint/eslint-plugin": "4.33.0",
+    "@typescript-eslint/parser": "4.33.0",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "2.24.2",
-    "firebase-tools": "latest",
     "jest": "27.2.4",
     "prettier": "2.4.1",
     "supertest": "6.1.6",
@@ -60,22 +52,5 @@
     "ts-node": "10.2.1",
     "tsconfig-paths": "3.11.0",
     "typescript": "4.3.5"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }
