@@ -35,16 +35,6 @@ services:
     environment:
        NODE_ENV: development
 
-  # y-websocket:
-  #   image: node:14-alpine
-  #   command: sh -c "npm install && npm run start"
-  #   network_mode: host
-  #   working_dir: /app
-  #   volumes:
-  #     - ./y-websocket:/app
-  #   environment:
-  #     PORT: 5001
-
   nats:
     entrypoint: "/nats-server -c nats-server.conf -DV"
     image: nats
