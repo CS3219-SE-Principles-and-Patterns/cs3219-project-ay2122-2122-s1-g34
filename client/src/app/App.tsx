@@ -5,6 +5,7 @@ import Login from "features/auth/Login";
 import PrivateRoute from "features/auth/PrivateRoute";
 import Register from "features/auth/Register";
 import { useUser } from "features/auth/use-user.hook";
+import Collaboration from "features/collaboration/Collaboration";
 import AppSnackbar from "features/snackbar/AppSnackbar";
 
 export default function App() {
@@ -20,6 +21,9 @@ export default function App() {
       <CssBaseline />
       <AppSnackbar />
       <Switch>
+        <Route path="/collaboration">
+          <Collaboration />
+        </Route>
         <Route path="/login">
           <Login />
         </Route>

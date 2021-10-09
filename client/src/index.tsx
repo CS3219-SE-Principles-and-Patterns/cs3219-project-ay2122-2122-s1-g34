@@ -9,6 +9,7 @@ import App from "app/App";
 import { store } from "app/store";
 import theme from "app/theme";
 
+import { SocketProvider } from "common/hooks/use-socket.hook";
 // initialize firebase web sdk
 import "common/utils/firebase.util";
 
@@ -21,7 +22,9 @@ ReactDOM.render(
     <Provider store={store}>
       <Router>
         <ThemeProvider theme={theme}>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </ThemeProvider>
       </Router>
     </Provider>
