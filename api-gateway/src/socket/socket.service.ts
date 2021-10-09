@@ -1,8 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { WebSocketServer } from "@nestjs/websockets";
 import { toUint8Array } from "js-base64";
 import * as encoding from "lib0/encoding";
-import { Socket, Server } from "socket.io";
+import { Socket } from "socket.io";
 import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
 
@@ -18,6 +17,7 @@ import {
 @Injectable()
 export class SocketService {
   handleConnection(client: Socket) {
+    client.join("monacco");
     const doc = getYDoc("monacco");
     doc.conns.set(client, new Set());
 

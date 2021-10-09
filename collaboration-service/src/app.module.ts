@@ -1,7 +1,9 @@
-import { Module } from '@nestjs/common';
-import { MathModule } from './math/math.module';
+import { Module } from "@nestjs/common";
+import { ClientsModule, Transport } from "@nestjs/microservices";
+
+import { CollaborationModule } from "./collaboration/collaboration.module";
 
 @Module({
-  imports: [MathModule],
+  imports: [CollaborationModule],
 })
 export class AppModule {}
