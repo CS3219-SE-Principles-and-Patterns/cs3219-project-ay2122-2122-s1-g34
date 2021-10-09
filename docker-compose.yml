@@ -38,6 +38,8 @@ services:
   nats:
     entrypoint: "/nats-server -c nats-server.conf -DV"
     image: nats
+    logging:
+      driver: none
     ports:
       - "4222:4222"
       - "6222:6222"

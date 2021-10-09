@@ -137,7 +137,6 @@ const setupWS = (provider: SocketIoProvider) => {
     });
 
     const onConnect = () => {
-      console.log("running on connect");
       provider.wsconnecting = false;
       provider.wsconnected = true;
       provider.wsUnsuccessfulReconnects = 0;

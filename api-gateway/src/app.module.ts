@@ -1,11 +1,18 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
+import { CollaborationModule } from "./collaboration/collaboration.module";
 import { FirebaseModule } from "./firebase/firebase.module";
+import { SocketModule } from "./socket/socket.module";
 import { UsersModule } from "./users/users.module";
-import { SocketModule } from './socket/socket.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), FirebaseModule, UsersModule, SocketModule],
+  imports: [
+    ConfigModule.forRoot(),
+    FirebaseModule,
+    UsersModule,
+    // SocketModule,
+    CollaborationModule,
+  ],
 })
 export class AppModule {}

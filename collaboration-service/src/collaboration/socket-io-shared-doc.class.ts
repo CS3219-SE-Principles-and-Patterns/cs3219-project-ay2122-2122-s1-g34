@@ -188,8 +188,6 @@ export const closeConn = (doc: SocketIoSharedDoc, socketId: string) => {
       docs.delete(doc.name);
     }
   }
-
-  doc.client.emit("collaboration:disconnect", { socketId });
 };
 
 export const send = (
@@ -198,5 +196,9 @@ export const send = (
   message: Uint8Array
 ) => {
   const base64Encoded = fromUint8Array(message);
-  doc.client.emit("collaboration:send", { socketId, message: base64Encoded });
+  doc.client.emit("collaboration:send", {
+    socketId,
+    message: base64Encoded,
+    roomName: doc.name,
+  });
 };
