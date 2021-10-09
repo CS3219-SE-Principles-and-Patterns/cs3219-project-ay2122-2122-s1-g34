@@ -23,6 +23,7 @@ export class CollaborationService {
       roomName: "monacco",
       socketId: client.id,
     });
+    client.disconnect();
   }
 
   handleCollaboration(client: Socket, message: string) {
