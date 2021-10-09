@@ -136,7 +136,8 @@ const setupWS = (provider: SocketIoProvider) => {
       }
     });
 
-    provider.socket.on("connect", () => {
+    const onConnect = () => {
+      console.log("running on connect");
       provider.wsconnecting = false;
       provider.wsconnected = true;
       provider.wsUnsuccessfulReconnects = 0;
@@ -166,7 +167,13 @@ const setupWS = (provider: SocketIoProvider) => {
         );
         provider.socket.emit("collaboration", base64Encoded);
       }
-    });
+    };
+
+    if (provider.socket.connected) {
+      onConnect();
+    } else {
+      provider.socket.on("connect", onConnect);
+    }
 
     provider.emit("status", [
       {

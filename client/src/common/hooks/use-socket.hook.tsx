@@ -6,9 +6,9 @@ export const Context = React.createContext<{
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined;
 }>({ socket: undefined });
 
-export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const socket = io();
+const socket = io();
 
+export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   return <Context.Provider value={{ socket }}>{children}</Context.Provider>;
 };
 
