@@ -3,7 +3,6 @@ import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import React from "react";
 
 import { useAppSelector } from "common/hooks/use-redux.hook";
-
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>((props, ref) => (
