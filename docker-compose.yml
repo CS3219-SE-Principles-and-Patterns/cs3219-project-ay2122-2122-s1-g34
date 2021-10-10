@@ -26,9 +26,20 @@ services:
        NODE_ENV: development
        PORT: 5000
 
+  collaboration-service:
+    image: node:14-alpine
+    command: sh -c "yarn install && yarn start:dev"
+    working_dir: /app
+    volumes:
+      - ./collaboration-service:/app
+    environment:
+       NODE_ENV: development
+
   nats:
     entrypoint: "/nats-server -c nats-server.conf -DV"
     image: nats
+    logging:
+      driver: none
     ports:
       - "4222:4222"
       - "6222:6222"
