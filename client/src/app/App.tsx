@@ -1,10 +1,15 @@
-import { CssBaseline, Typography } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import { Switch, Route } from "react-router-dom";
+
+import TopRainbowBar from "common/components/TopRainbowBar";
 
 import Login from "features/auth/Login";
 import PrivateRoute from "features/auth/PrivateRoute";
 import Register from "features/auth/Register";
 import { useUser } from "features/auth/use-user.hook";
+import Dashboard from "features/dashboard/Dashboard";
+import Leaderboard from "features/leaderboard/Leaderboard";
+import PastAttempts from "features/past-attempts/PastAttempts";
 import AppSnackbar from "features/snackbar/AppSnackbar";
 
 export default function App() {
@@ -16,20 +21,36 @@ export default function App() {
   }
 
   return (
-    <>
+    <div
+      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+    >
       <CssBaseline />
       <AppSnackbar />
       <Switch>
         <Route path="/login">
+          <TopRainbowBar />
           <Login />
         </Route>
         <Route path="/register">
+          <TopRainbowBar />
           <Register />
         </Route>
+
         <PrivateRoute path="/">
-          <Typography>Signed in</Typography>
+          <TopRainbowBar />
+          <Dashboard />
+        </PrivateRoute>
+
+        <PrivateRoute path="/past-attempts">
+          <TopRainbowBar />
+          <PastAttempts />
+        </PrivateRoute>
+
+        <PrivateRoute path="/leaderboard">
+          <TopRainbowBar />
+          <Leaderboard />
         </PrivateRoute>
       </Switch>
-    </>
+    </div>
   );
 }
