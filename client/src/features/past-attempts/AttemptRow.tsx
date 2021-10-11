@@ -1,8 +1,28 @@
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography, styled } from "@mui/material";
 
 import { useAppDispatch } from "common/hooks/use-redux.hook";
 
 import { Attempt, setCurrentAttempt } from "./past-attempts.slice";
+
+const HeaderGrid = styled(Grid)({
+  marginBottom: 1,
+  "&.MuiGrid-item": {
+    paddingLeft: 0,
+  },
+  "&.MuiGrid-root.MuiGrid-root": {
+    marginLeft: 0,
+  },
+});
+
+const AttemptGrid = styled(Grid)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  "&.MuiGrid-item.MuiGrid-item": {
+    paddingTop: 0,
+    paddingLeft: 0,
+  },
+});
 
 interface AttemptRowProps {
   attempt?: Attempt;
@@ -27,72 +47,24 @@ export default function AttemptRow({ attempt }: AttemptRowProps) {
           },
         }}
       >
-        <Grid
-          item
-          xs={3}
-          sx={{
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingLeft: 0,
-            },
-          }}
-        >
+        <HeaderGrid item xs={3}>
           <Typography fontWeight="500">Question</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingLeft: 0,
-            },
-          }}
-        >
+        </HeaderGrid>
+        <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Difficulty</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingLeft: 0,
-            },
-          }}
-        >
+        </HeaderGrid>
+        <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Status</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingLeft: 0,
-            },
-          }}
-        >
+        </HeaderGrid>
+        <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Peer</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingLeft: 0,
-            },
-          }}
-        >
+        </HeaderGrid>
+        <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Points</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingLeft: 0,
-            },
-          }}
-        >
+        </HeaderGrid>
+        <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Review</Typography>
-        </Grid>
+        </HeaderGrid>
       </Grid>
     );
   } else {
@@ -127,105 +99,34 @@ export default function AttemptRow({ attempt }: AttemptRowProps) {
           },
         }}
       >
-        <Grid
-          item
-          xs={3}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingTop: 0,
-              paddingLeft: 0,
-            },
-          }}
-        >
+        <AttemptGrid item xs={3}>
           <Typography>{question}</Typography>
-        </Grid>
-
-        <Grid
-          item
-          xs={2}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingTop: 0,
-              paddingLeft: 0,
-            },
-            "p:first-letter": {
+        </AttemptGrid>
+        <AttemptGrid item xs={2}>
+          <Typography
+            sx={{
               textTransform: "capitalize",
-            },
-          }}
-        >
-          <Typography>{difficulty}</Typography>
-        </Grid>
-
-        <Grid
-          item
-          xs={2}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingTop: 0,
-              paddingLeft: 0,
-            },
-            "p:first-letter": {
+            }}
+          >
+            {difficulty}
+          </Typography>
+        </AttemptGrid>
+        <AttemptGrid item xs={2}>
+          <Typography
+            sx={{
               textTransform: "capitalize",
-            },
-          }}
-        >
-          <Typography>{status}</Typography>
-        </Grid>
-
-        <Grid
-          item
-          xs={2}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingTop: 0,
-              paddingLeft: 0,
-            },
-          }}
-        >
+            }}
+          >
+            {status}
+          </Typography>
+        </AttemptGrid>
+        <AttemptGrid item xs={2}>
           <Typography>{peer}</Typography>
-        </Grid>
-
-        <Grid
-          item
-          xs={2}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingTop: 0,
-              paddingLeft: 0,
-            },
-          }}
-        >
+        </AttemptGrid>
+        <AttemptGrid item xs={2}>
           <Typography>{points}</Typography>
-        </Grid>
-
-        <Grid
-          item
-          xs={2}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            "&.MuiGrid-item.MuiGrid-item": {
-              paddingTop: 0,
-              paddingLeft: 0,
-            },
-          }}
-        >
+        </AttemptGrid>
+        <AttemptGrid item xs={2}>
           <Button
             variant="contained"
             onClick={onClickReview}
@@ -237,7 +138,7 @@ export default function AttemptRow({ attempt }: AttemptRowProps) {
           >
             Review
           </Button>
-        </Grid>
+        </AttemptGrid>
       </Grid>
     );
   }

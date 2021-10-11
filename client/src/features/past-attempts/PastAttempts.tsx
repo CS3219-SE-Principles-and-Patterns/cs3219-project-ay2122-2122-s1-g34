@@ -1,28 +1,18 @@
 import { Box, Container, Grid, Typography } from "@mui/material";
-import { Redirect } from "react-router-dom";
 
 import { useAppSelector } from "common/hooks/use-redux.hook";
 
 import SignedInHeader from "features/auth/SignedInHeader";
-import { selectUser } from "features/auth/user.slice";
 
 import AttemptRow from "./AttemptRow";
 import { selectPastAttempts } from "./past-attempts.slice";
 
 export default function PastAttempts() {
-  const user = useAppSelector(selectUser);
   const pastAttempts = useAppSelector(selectPastAttempts);
 
-  return !!user ? (
-    <Redirect
-      to={{
-        pathname: "/",
-      }}
-    />
-  ) : (
+  return (
     <>
       <SignedInHeader />
-
       <Container maxWidth="lg" disableGutters sx={{ paddingY: 1 }}>
         <Box
           sx={{
