@@ -24,32 +24,26 @@ export default function App() {
   return (
     <>
       <CssBaseline />
-      <Box
-        sx={{ minHeight: "100%", display: "flex", flexDirection: "column" }}
-      >
+      <Box sx={{ minHeight: "100%", display: "flex", flexDirection: "column" }}>
         <AppSnackbar />
+        <TopRainbowBar />
         <Switch>
           <Route path="/collaboration">
             <Collaboration />
           </Route>
           <Route path="/login">
-            <TopRainbowBar />
             <Login />
           </Route>
           <Route path="/register">
-            <TopRainbowBar />
             <Register />
           </Route>
           <PrivateRoute path="/">
-            <TopRainbowBar />
             <Dashboard />
           </PrivateRoute>
           <PrivateRoute path="/past-attempts">
-            <TopRainbowBar />
             <PastAttempts />
           </PrivateRoute>
           <PrivateRoute path="/leaderboard">
-            <TopRainbowBar />
             <Leaderboard />
           </PrivateRoute>
         </Switch>
