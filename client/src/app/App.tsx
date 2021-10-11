@@ -40,17 +40,14 @@ export default function App() {
             <TopRainbowBar />
             <Register />
           </Route>
-
           <PrivateRoute path="/">
             <TopRainbowBar />
             <Dashboard />
           </PrivateRoute>
-
           <PrivateRoute path="/past-attempts">
             <TopRainbowBar />
             <PastAttempts />
           </PrivateRoute>
-
           <PrivateRoute path="/leaderboard">
             <TopRainbowBar />
             <Leaderboard />

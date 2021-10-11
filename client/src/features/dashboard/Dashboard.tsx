@@ -1,13 +1,10 @@
-import { signOut } from "@firebase/auth";
 import { Box, Container, Grid, Typography } from "@mui/material";
-import { Redirect, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
-import { auth } from "common/utils/firebase.util";
 
 import SignedInHeader from "features/auth/SignedInHeader";
-import { removeUserStorage } from "features/auth/user-storage.util";
-import { selectUser } from "features/auth/user.slice";
+import { logout, selectUser } from "features/auth/user.slice";
 import MatchingModal from "features/matching/MatchingModal";
 import {
   setIsMatching,
@@ -28,16 +25,9 @@ export default function Dashboard() {
   const dayStreak = "3rd";
   const userDisplayName = user ? user.displayName : "";
 
-  return !!user ? (
-    <Redirect
-      to={{
-        pathname: "/",
-      }}
-    />
-  ) : (
+  return (
     <>
       <MatchingModal />
-
       <SignedInHeader />
       <Container maxWidth="lg" disableGutters sx={{ paddingY: 1 }}>
         <Box sx={{ display: "flex", flex: 1, alignSelf: "flex-start" }}>
@@ -151,7 +141,9 @@ export default function Dashboard() {
                   outlineColor={"yellow"}
                   title={"Logout"}
                   subtitle={"See you again!"}
-                  onCardClick={logout}
+                  onCardClick={() => {
+                    dispatch(logout());
+                  }}
                 />
               </Grid>
             </Grid>
@@ -185,14 +177,5 @@ export default function Dashboard() {
 
   function navigateToPastAttempts() {
     history.push("/past-attempts");
-  }
-
-  /**
-   * Removes the current user from the user
-   * storage and signs the user out.
-   */
-  async function logout() {
-    removeUserStorage();
-    await signOut(auth);
   }
 }
