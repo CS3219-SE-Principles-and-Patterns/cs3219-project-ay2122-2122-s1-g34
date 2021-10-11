@@ -3,13 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 
 import { Difficulty, Question } from "../../questions/entities/question.entity";
 
-enum Status {
+export enum Status {
   Open = "open",
   InProgress = "in-progress",
   Closed = "closed",
@@ -17,7 +17,7 @@ enum Status {
 
 @Entity()
 export class Session {
-  @PrimaryColumn("uuid")
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   // only 2 users are allowed per session. whitelisted user ids will be added to this array
@@ -30,7 +30,7 @@ export class Session {
   })
   difficulty: Difficulty;
 
-  @ManyToOne(() => Question, { nullable: false })
+  @ManyToOne(() => Question)
   question: Question;
 
   @Column({ type: "enum", enum: Status, default: Status.Open })

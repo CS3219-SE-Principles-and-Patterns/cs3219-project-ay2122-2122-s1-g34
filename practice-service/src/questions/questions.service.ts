@@ -15,7 +15,7 @@ export class QuestionsService {
     return this.questionsRepository
       .createQueryBuilder("question")
       .where("question.difficulty = :difficulty", { difficulty })
-      .orderBy("RAND()")
+      .orderBy("RANDOM()")
       .getOne();
   }
 }
