@@ -20,7 +20,7 @@ export class SessionsController {
   }
 
   @MessagePattern("findOneSession")
-  findOne(@Payload() id: number) {
+  findOne(@Payload() id: string) {
     return this.sessionsService.findOne(id);
   }
 
@@ -30,7 +30,7 @@ export class SessionsController {
   }
 
   @MessagePattern("removeSession")
-  remove(@Payload() id: number) {
+  remove(@Payload() id: string) {
     return this.sessionsService.remove(id);
   }
 }

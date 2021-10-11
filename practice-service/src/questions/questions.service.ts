@@ -1,26 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { CreateQuestionDto } from './dto/create-question.dto';
-import { UpdateQuestionDto } from './dto/update-question.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+
+import { Difficulty, Question } from "./entities/question.entity";
 
 @Injectable()
 export class QuestionsService {
-  create(createQuestionDto: CreateQuestionDto) {
-    return 'This action adds a new question';
-  }
+  constructor(
+    @InjectRepository(Question)
+    private readonly questionsRepository: Repository<Question>
+  ) {}
 
-  findAll() {
-    return `This action returns all questions`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} question`;
-  }
-
-  update(id: number, updateQuestionDto: UpdateQuestionDto) {
-    return `This action updates a #${id} question`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} question`;
+  getRandom(difficulty: Difficulty) {
+    return this.questionsRepository
+      .createQueryBuilder("question")
+      .where("question.difficulty = :difficulty", { difficulty })
+      .orderBy("RAND()")
+      .getOne();
   }
 }

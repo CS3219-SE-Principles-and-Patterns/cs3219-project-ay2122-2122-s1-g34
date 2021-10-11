@@ -1,6 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSessionDto } from './create-session.dto';
+import { IsString, IsUUID } from "class-validator";
 
-export class UpdateSessionDto extends PartialType(CreateSessionDto) {
-  id: number;
+export class UpdateSessionDto {
+  @IsUUID()
+  readonly id: string;
+
+  @IsString()
+  readonly secondUserId: string;
 }
