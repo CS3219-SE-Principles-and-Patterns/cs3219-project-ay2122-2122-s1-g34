@@ -37,14 +37,14 @@ export default function App() {
           <Route path="/register">
             <Register />
           </Route>
-          <PrivateRoute path="/">
-            <Dashboard />
-          </PrivateRoute>
           <PrivateRoute path="/past-attempts">
             <PastAttempts />
           </PrivateRoute>
           <PrivateRoute path="/leaderboard">
             <Leaderboard />
+          </PrivateRoute>
+          <PrivateRoute path="/">
+            <Dashboard />
           </PrivateRoute>
         </Switch>
       </Box>
