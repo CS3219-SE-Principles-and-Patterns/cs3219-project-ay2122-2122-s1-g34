@@ -37,7 +37,7 @@ services:
 
   practice-service:
     image: node:14-alpine
-    command: sh -c "yarn install && yarn start:dev"
+    command: sh -c "yarn install && yarn run seed && yarn start:dev"
     working_dir: /app
     volumes:
       - ./practice-service:/app

@@ -6,16 +6,28 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
+export enum Difficulty {
+  EASY = "easy",
+  MEDIUM = "medium",
+  HARD = "hard",
+}
+
 @Entity()
 export class Question {
   @PrimaryColumn("uuid")
   id: string;
 
   @Column()
-  questionHtml: string;
+  answer: string;
+
+  @Column({
+    type: "enum",
+    enum: Difficulty,
+  })
+  difficulty: Difficulty;
 
   @Column()
-  answer: string;
+  questionHtml: string;
 
   @CreateDateColumn()
   createdAt: Date;
