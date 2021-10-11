@@ -35,6 +35,23 @@ services:
     environment:
        NODE_ENV: development
 
+  practice-service:
+    image: node:14-alpine
+    command: sh -c "yarn install && yarn start:dev"
+    working_dir: /app
+    volumes:
+      - ./practice-service:/app
+    env_file: ./practice-service/.env
+    
+  practice-service-postgres:
+    restart: always
+    env_file: ./practice-service/.env
+    image: postgres:12
+    volumes:
+      - practice-service-postgres-dev:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
   nats:
     entrypoint: "/nats-server -c nats-server.conf -DV"
     image: nats
@@ -44,3 +61,6 @@ services:
       - "4222:4222"
       - "6222:6222"
       - "8222:8222"
+
+volumes:
+  practice-service-postgres-dev:
