@@ -1,7 +1,7 @@
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 
-import { CreateSessionDto } from "./dto/create-session.dto";
+import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { SessionsService } from "./sessions.service";
 
@@ -9,9 +9,9 @@ import { SessionsService } from "./sessions.service";
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 
-  @MessagePattern("createSession")
-  create(@Payload() createSessionDto: CreateSessionDto) {
-    return this.sessionsService.create(createSessionDto);
+  @MessagePattern("joinSession")
+  join(@Payload() joinSessionDto: JoinSessionDto) {
+    return this.sessionsService.join(joinSessionDto);
   }
 
   @MessagePattern("findAllSessions")

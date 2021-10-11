@@ -9,6 +9,14 @@ export class FirebaseService {
     admin.initializeApp({ projectId: "peerprep-bde04" });
   }
 
+  /**
+   * Verifies firebase JWT
+   * @param token Firebase JWT token
+   */
+  verifyIdToken(token: string) {
+    return admin.auth().verifyIdToken(token);
+  }
+
   async createUser(properties: admin.auth.CreateRequest) {
     try {
       const userRecord = await admin.auth().createUser(properties);

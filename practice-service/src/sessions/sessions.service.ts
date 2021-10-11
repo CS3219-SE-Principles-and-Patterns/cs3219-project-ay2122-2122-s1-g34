@@ -1,12 +1,13 @@
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
+import { RpcException } from "@nestjs/microservices";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToClass } from "class-transformer";
 import { QuestionsService } from "src/questions/questions.service";
 import { Repository } from "typeorm";
 
-import { CreateSessionDto } from "./dto/create-session.dto";
+import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
-import { Session } from "./entities/session.entity";
+import { Session, Status } from "./entities/session.entity";
 
 @Injectable()
 export class SessionsService {
@@ -16,17 +17,55 @@ export class SessionsService {
     private readonly sessionsRepository: Repository<Session>
   ) {}
 
-  async create(createSessionDto: CreateSessionDto) {
-    const { difficulty, userId } = createSessionDto;
+  private async create(joinSessionDto: JoinSessionDto) {
+    const { difficulty, userId } = joinSessionDto;
     const question = await this.questionsService.getRandom(difficulty);
 
     const newSession = plainToClass(Session, {
       allowedUserIds: [userId],
-      difficulty: createSessionDto.difficulty,
-      question: question,
+      difficulty: joinSessionDto.difficulty,
+      question,
     });
 
-    return this.sessionsRepository.save(newSession)
+    return this.sessionsRepository.save(newSession);
+  }
+
+  private joinExisting(session: Session, joinSessionDto: JoinSessionDto) {
+    const { userId } = joinSessionDto;
+    session.allowedUserIds = [...session.allowedUserIds, userId];
+    session.status = Status.InProgress;
+    return this.sessionsRepository.save(session);
+  }
+
+  async join(joinSessionDto: JoinSessionDto) {
+    const { difficulty, userId } = joinSessionDto;
+
+    const isUserInExistingSession = await this.sessionsRepository
+      .createQueryBuilder("session")
+      .where(":userId = ANY(session.allowedUserIds)", { userId })
+      .getOne();
+
+    if (!!isUserInExistingSession) {
+      throw new RpcException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: "You are already in an existing practice session!",
+        error: "Bad Request",
+      });
+    }
+
+    const existingSession = await this.sessionsRepository
+      .createQueryBuilder("session")
+      .where("session.difficulty = :difficulty", { difficulty })
+      .andWhere("ARRAY_LENGTH(session.allowedUserIds, 1) = 1") // only find sessions that have only 1 connected user
+      .orderBy("RANDOM()")
+      .getOne();
+
+    if (!existingSession) {
+      // no session of specified difficulty exists, create new session
+      return this.create(joinSessionDto);
+    } else {
+      return this.joinExisting(existingSession, joinSessionDto);
+    }
   }
 
   findAll() {
