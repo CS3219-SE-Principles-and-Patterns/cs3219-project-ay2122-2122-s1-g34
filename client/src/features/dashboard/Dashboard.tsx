@@ -1,10 +1,15 @@
 import { Box, Container, Grid, Typography } from "@mui/material";
+import React from "react";
 import { useHistory } from "react-router-dom";
 
+import BackdropSpinner from "common/components/BackdropSpinner";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
+import { useSocket, useOnSocketDisconnect } from "common/hooks/use-socket.hook";
 
 import SignedInHeader from "features/auth/SignedInHeader";
 import { logout, selectUser } from "features/auth/user.slice";
+import DashboardCard from "features/dashboard/DashboardCard";
+import { joinSession } from "features/dashboard/join-session.util";
 import MatchingModal from "features/matching/MatchingModal";
 import {
   setIsMatching,
@@ -12,21 +17,40 @@ import {
   setHasTimeout,
   DifficultyLevel,
 } from "features/matching/matching.slice";
-
-import DashboardCard from "./DashboardCard";
+import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 export default function Dashboard() {
-  const history = useHistory();
-
+  const [isLoading, setIsLoading] = React.useState(false);
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const user = useAppSelector(selectUser);
+  const { open } = useSnackbar();
+  const { socket, setSocket } = useSocket();
+  useOnSocketDisconnect(() => {
+    dispatch(setIsMatching(false));
+    setIsLoading(false);
+  });
 
   // TODO: replace dummy data
   const dayStreak = "3rd";
   const userDisplayName = user ? user.displayName : "";
 
+  React.useEffect(() => {
+    if (socket) {
+      const callback = () => {
+        history.push("/session");
+      };
+      socket.on("session:started", callback);
+
+      return () => {
+        socket.off("session:started", callback);
+      };
+    }
+  }, [socket, history]);
+
   return (
     <>
+      <BackdropSpinner open={isLoading} />
       <MatchingModal />
       <SignedInHeader />
       <Container maxWidth="lg" disableGutters sx={{ paddingY: 1 }}>
@@ -158,12 +182,28 @@ export default function Dashboard() {
    * user with another available user.
    * @param difficulty Difficulty level of the question
    */
-  function quickStartQuestion(difficulty: DifficultyLevel) {
-    dispatch(setIsMatching(true));
-    dispatch(setHasTimeout(false));
-    dispatch(setDifficulty(difficulty));
+  async function quickStartQuestion(difficulty: DifficultyLevel) {
+    try {
+      setIsLoading(true);
+      const socket = await joinSession(difficulty);
+      setSocket(socket);
 
-    // TODO: match with a peer
+      dispatch(setIsMatching(true));
+      dispatch(setHasTimeout(false));
+      dispatch(setDifficulty(difficulty));
+    } catch (e: any) {
+      if (e?.response?.data?.message) {
+        open({ message: e.response.data.message, severity: "error" });
+      } else {
+        open({
+          message:
+            "An error has occurred. You are unable to join a practice session.",
+          severity: "error",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function continueOngoingTask() {

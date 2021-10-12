@@ -20,5 +20,6 @@ import { CollaborationService } from "./collaboration.service";
   ],
   controllers: [CollaborationController],
   providers: [CollaborationGateway, CollaborationService],
+  exports: [CollaborationService],
 })
 export class CollaborationModule {}

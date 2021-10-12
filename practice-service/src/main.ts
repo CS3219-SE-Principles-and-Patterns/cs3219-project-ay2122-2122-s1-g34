@@ -1,4 +1,3 @@
-import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 
@@ -11,13 +10,10 @@ async function bootstrap() {
       transport: Transport.NATS,
       options: {
         servers: ["nats://nats:4222"],
-        queue: "collaboration_queue",
+        queue: "practice_queue",
       },
     }
   );
-
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-
   await app.listen();
 }
 bootstrap();
