@@ -12,4 +12,9 @@ export class SessionsController {
   join(@Payload() joinSessionDto: JoinSessionDto) {
     return this.sessionsService.join(joinSessionDto);
   }
+
+  @MessagePattern("findOneSessionByUser")
+  findOneByUser(@Payload() userId: string) {
+    return this.sessionsService.findOneByUser(userId);
+  }
 }

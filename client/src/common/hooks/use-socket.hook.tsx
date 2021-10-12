@@ -2,7 +2,7 @@ import React from "react";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 
-export const Context = React.createContext<{
+const Context = React.createContext<{
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined;
   setSocket: React.Dispatch<
     React.SetStateAction<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>

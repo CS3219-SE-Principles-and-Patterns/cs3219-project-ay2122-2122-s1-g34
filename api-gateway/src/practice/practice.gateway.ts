@@ -19,10 +19,8 @@ export class PracticeGateway
 
   constructor(private readonly practiceService: PracticeService) {}
 
-  handleConnection(client: Socket, payload: any) {
-    console.log(payload);
-    client.disconnect();
-    throw new Error("Method not implemented.");
+  handleConnection(client: Socket) {
+    return this.practiceService.handleSocketConnection(client);
   }
 
   handleDisconnect(client: Socket) {}
