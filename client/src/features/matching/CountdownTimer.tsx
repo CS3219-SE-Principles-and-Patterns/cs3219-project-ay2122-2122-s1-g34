@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 export default function CountdownTimer({
   timeAllowed,
   callbackOnTimeout,
-  hasTimeout
+  hasTimeout,
 }: {
   timeAllowed: number;
   callbackOnTimeout: () => void;
@@ -23,6 +23,10 @@ export default function CountdownTimer({
       }
       setRemainingTime(remainingTime - 1);
     }, 1000);
+
+    return () => {
+      window.clearInterval(timeout.current);
+    };
   }, [callbackOnTimeout, remainingTime]);
 
   return (

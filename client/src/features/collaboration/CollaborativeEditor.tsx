@@ -1,15 +1,20 @@
 import Editor from "@monaco-editor/react";
-import { Box } from "@mui/material";
+import { Box, BoxProps } from "@mui/material";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
 import { useSocket } from "common/hooks/use-socket.hook";
 
-import { SocketIoProvider } from "./y-socket-io.class";
+import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
 
-export default function Collaboration() {
+interface CollaborativeEditorProps extends BoxProps {}
+
+export default function CollaborativeEditor({
+  sx,
+  ...rest
+}: CollaborativeEditorProps) {
   const { socket } = useSocket();
-  function handleEditorDidMount(editor: any, monaco: any) {
+  function handleEditorDidMount(editor: any) {
     if (socket) {
       const ydocument = new Y.Doc();
       const provider = new SocketIoProvider(socket, ydocument);
@@ -27,8 +32,14 @@ export default function Collaboration() {
 
   return (
     <Box
+      {...rest}
       sx={{
-        height: "90vh",
+        ...(sx ?? {}),
+        borderRadius: 3,
+        borderWidth: 2,
+        borderStyle: "solid",
+        borderColor: "#5F4BA8",
+        padding: 2,
         "& .yRemoteSelection": {
           backgroundColor: "rgb(250, 129, 0, .5)",
         },
@@ -51,7 +62,7 @@ export default function Collaboration() {
       }}
     >
       <Editor
-        height="90vh"
+        height="100%"
         defaultLanguage="javascript"
         onMount={handleEditorDidMount}
       />

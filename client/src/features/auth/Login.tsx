@@ -3,6 +3,7 @@ import { Box, Container, Grid, Typography, Button } from "@mui/material";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useFormik } from "formik";
 import { Redirect } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import * as yup from "yup";
 
 import Header from "common/components/Header";
@@ -78,6 +79,8 @@ export default function Login() {
           <Button
             variant="contained"
             size="small"
+            component={RouterLink}
+            to="/register"
             sx={{
               borderRadius: 40,
               marginLeft: 3,

@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { CollaborationModule } from "./collaboration/collaboration.module";
 import { FirebaseModule } from "./firebase/firebase.module";
 import { UsersModule } from "./users/users.module";
+import { PracticeModule } from './practice/practice.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { UsersModule } from "./users/users.module";
     FirebaseModule,
     UsersModule,
     CollaborationModule,
+    PracticeModule,
   ],
 })
 export class AppModule {}
