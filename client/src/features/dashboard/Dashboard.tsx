@@ -8,6 +8,7 @@ import { useSocket, useOnSocketDisconnect } from "common/hooks/use-socket.hook";
 
 import SignedInHeader from "features/auth/SignedInHeader";
 import { logout, selectUser } from "features/auth/user.slice";
+import DashboardCard from "features/dashboard/DashboardCard";
 import { joinSession } from "features/dashboard/join-session.util";
 import MatchingModal from "features/matching/MatchingModal";
 import {
@@ -18,15 +19,13 @@ import {
 } from "features/matching/matching.slice";
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
-import DashboardCard from "./DashboardCard";
-
 export default function Dashboard() {
   const [isLoading, setIsLoading] = React.useState(false);
   const dispatch = useAppDispatch();
   const history = useHistory();
   const user = useAppSelector(selectUser);
   const { open } = useSnackbar();
-  const { setSocket } = useSocket();
+  const { socket, setSocket } = useSocket();
   useOnSocketDisconnect(() => {
     dispatch(setIsMatching(false));
     setIsLoading(false);
@@ -35,6 +34,19 @@ export default function Dashboard() {
   // TODO: replace dummy data
   const dayStreak = "3rd";
   const userDisplayName = user ? user.displayName : "";
+
+  React.useEffect(() => {
+    if (socket) {
+      const callback = () => {
+        history.push("/session");
+      };
+      socket.on("session:started", callback);
+
+      return () => {
+        socket.off("session:started", callback);
+      };
+    }
+  }, [socket, history]);
 
   return (
     <>

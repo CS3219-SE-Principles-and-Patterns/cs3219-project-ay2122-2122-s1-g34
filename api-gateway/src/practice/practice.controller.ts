@@ -22,6 +22,14 @@ export class PracticeController {
     return this.practiceService.joinSession(user, joinSessionDto);
   }
 
+  @EventPattern("session:started")
+  handleSessionStarted(sessionId: string) {
+    return this.practiceService.handleSessionStarted(
+      sessionId,
+      this.practiceGateway.server
+    );
+  }
+
   @EventPattern("session:removed")
   handleSessionRemoved(sessionId: string) {
     return this.practiceService.handleSessionRemoved(
