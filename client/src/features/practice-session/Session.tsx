@@ -51,7 +51,7 @@ export default function Session() {
       <QuestionDisplay
         sx={{
           minHeight: "230px",
-          marginBottom: 3,
+          marginBottom: 2,
         }}
         question={question}
       />
