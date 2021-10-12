@@ -29,6 +29,9 @@ export class Question {
   @Column()
   questionHtml: string;
 
+  @Column()
+  title: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
