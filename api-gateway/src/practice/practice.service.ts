@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import * as admin from "firebase-admin";
 import { map } from "rxjs";
+import { Server } from "socket.io";
 
 import { JoinSessionDto } from "./dto/join-session.dto";
 
@@ -16,5 +17,12 @@ export class PracticeService {
         ...joinSessionDto,
       })
       .pipe(map((session) => ({ sessionId: session.id })));
+  }
+
+  async handleSessionRemoved(sessionId: string, server: Server) {
+    const sockets = await server.in(sessionId).fetchSockets();
+    sockets.forEach((socket) => {
+      socket.disconnect();
+    });
   }
 }

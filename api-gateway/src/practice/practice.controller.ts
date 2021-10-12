@@ -1,19 +1,32 @@
 import { Controller, Post, Body, UseGuards } from "@nestjs/common";
+import { EventPattern } from "@nestjs/microservices";
 import { ApiHeader } from "@nestjs/swagger";
 import { AuthGuard } from "src/common/guards/auth.guard";
 
 import { User } from "../common/decorators/user.decorator";
 import { JoinSessionDto } from "./dto/join-session.dto";
+import { PracticeGateway } from "./practice.gateway";
 import { PracticeService } from "./practice.service";
 
 @Controller({ path: "practice", version: "1" })
 @ApiHeader({ name: "token" })
 @UseGuards(AuthGuard)
 export class PracticeController {
-  constructor(private readonly practiceService: PracticeService) {}
+  constructor(
+    private readonly practiceGateway: PracticeGateway,
+    private readonly practiceService: PracticeService
+  ) {}
 
   @Post()
   joinSession(@User() user, @Body() joinSessionDto: JoinSessionDto) {
     return this.practiceService.joinSession(user, joinSessionDto);
+  }
+
+  @EventPattern("session:removed")
+  handleSessionRemoved(sessionId: string) {
+    return this.practiceService.handleSessionRemoved(
+      sessionId,
+      this.practiceGateway.server
+    );
   }
 }
