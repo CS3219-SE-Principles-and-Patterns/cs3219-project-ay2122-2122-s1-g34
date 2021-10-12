@@ -20,15 +20,6 @@ export class SessionsService {
     private readonly sessionsRepository: Repository<Session>
   ) {}
 
-  findOne(id: string) {
-    return this.sessionsRepository
-      .createQueryBuilder("session")
-      .select(["question.title", "question.questionHtml"])
-      .leftJoin("session.question", "question")
-      .where("session.id = :id", { id })
-      .getOne();
-  }
-
   private async create(joinSessionDto: JoinSessionDto) {
     const { difficulty, userId } = joinSessionDto;
     const question = await this.questionsService.getRandom(difficulty);
@@ -76,6 +67,18 @@ export class SessionsService {
       })
       .andWhere("session.status != :status", { status: Status.Closed })
       .getOne();
+  }
+
+  async findOneInProgressSession(id: string) {
+    const result = await this.sessionsRepository
+      .createQueryBuilder("session")
+      .select(["session.id", "question.title", "question.questionHtml"])
+      .leftJoin("session.question", "question")
+      .where("session.id = :id", { id })
+      .andWhere("session.status = :status", { status: Status.InProgress })
+      .getOne();
+      
+    return result;
   }
 
   async join(joinSessionDto: JoinSessionDto) {

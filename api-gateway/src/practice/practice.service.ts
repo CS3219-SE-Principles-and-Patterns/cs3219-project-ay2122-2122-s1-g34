@@ -84,6 +84,8 @@ export class PracticeService {
 
   async practiceInit(client: Socket) {
     this.collaborationService.handleConnection(client);
-    return this.natsClient.send("findOneSession", client.data.sessionId);
+    return firstValueFrom(
+      this.natsClient.send("findOneInProgressSession", client.data.sessionId)
+    );
   }
 }
