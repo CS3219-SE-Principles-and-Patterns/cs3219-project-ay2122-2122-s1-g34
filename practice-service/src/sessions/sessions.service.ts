@@ -7,7 +7,6 @@ import { CronJob } from "cron";
 import { QuestionsService } from "src/questions/questions.service";
 import { Repository } from "typeorm";
 
-import * as postgresErrorCodes from "../common/constants/postgres-error-codes.json";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { Session, Status } from "./entities/session.entity";
 
@@ -20,6 +19,15 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionsRepository: Repository<Session>
   ) {}
+
+  findOne(id: string) {
+    return this.sessionsRepository
+      .createQueryBuilder("session")
+      .select(["question.title", "question.questionHtml"])
+      .leftJoin("session.question", "question")
+      .where("session.id = :id", { id })
+      .getOne();
+  }
 
   private async create(joinSessionDto: JoinSessionDto) {
     const { difficulty, userId } = joinSessionDto;
@@ -97,40 +105,32 @@ export class SessionsService {
     }
   }
 
-  async handleSessionDisconnect(
+  async handleSessionDisconnecting(
     sessionId: string,
     isAnotherUserInSession: boolean
   ) {
-    try {
-      const session = await this.sessionsRepository
-        .createQueryBuilder("session")
-        .where("session.id = :sessionId", {
-          sessionId,
-        })
-        .getOne();
+    const session = await this.sessionsRepository
+      .createQueryBuilder("session")
+      .where("session.id = :sessionId", {
+        sessionId,
+      })
+      .getOne();
 
-      if (!session) {
-        return;
-      }
+    if (!session) {
+      return;
+    }
 
-      if (session.status === Status.Open) {
-        // delete session if user disconnects even before anyone has joined the room
-        await this.sessionsRepository.remove(session);
-      } else if (
-        session.status === Status.InProgress &&
-        !isAnotherUserInSession
-      ) {
-        // close session if both users disconnected
-        // TODO: maybe don't close immediately (?)
-        session.status = Status.Closed;
-        await this.sessionsRepository.save(session);
-      }
-    } catch (e) {
-      if (postgresErrorCodes[e.code] === "invalid_text_representation") {
-        // ignore errors if we try to query session using non uuid id
-      } else {
-        throw new RpcException(e);
-      }
+    if (session.status === Status.Open) {
+      // delete session if user disconnects even before anyone has joined the room
+      await this.sessionsRepository.remove(session);
+    } else if (
+      session.status === Status.InProgress &&
+      !isAnotherUserInSession
+    ) {
+      // close session if both users disconnected
+      // TODO: maybe don't close immediately (?)
+      session.status = Status.Closed;
+      await this.sessionsRepository.save(session);
     }
   }
 }

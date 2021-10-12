@@ -1,10 +1,8 @@
 import {
   WebSocketGateway,
-  OnGatewayConnection,
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
-  OnGatewayDisconnect,
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
@@ -12,21 +10,11 @@ import { Socket, Server } from "socket.io";
 import { CollaborationService } from "./collaboration.service";
 
 @WebSocketGateway()
-export class CollaborationGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class CollaborationGateway {
   @WebSocketServer()
   server: Server;
 
   constructor(private readonly collaborationService: CollaborationService) {}
-
-  handleConnection(client: Socket) {
-    // this.collaborationService.handleConnection(client);
-  }
-
-  handleDisconnect(client: Socket) {
-    this.collaborationService.handleDisconnect(client);
-  }
 
   @SubscribeMessage("collaboration")
   handleCollaboration(

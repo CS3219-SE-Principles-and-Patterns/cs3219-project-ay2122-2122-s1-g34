@@ -11,19 +11,17 @@ export class CollaborationService {
   ) {}
 
   handleConnection(client: Socket) {
-    client.join("monacco");
     this.natsClient.emit("collaboration:connected", {
-      roomName: "monacco",
+      roomName: client.data.sessionId,
       socketId: client.id,
     });
   }
 
-  handleDisconnect(client: Socket) {
-    this.natsClient.emit("collaboration:disconnected", {
-      roomName: "monacco",
+  handleDisconnecting(client: Socket) {
+    this.natsClient.emit("collaboration:disconnecting", {
+      roomName: client.data.sessionId,
       socketId: client.id,
     });
-    client.disconnect();
   }
 
   handleCollaboration(client: Socket, message: string) {
