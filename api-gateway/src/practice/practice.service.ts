@@ -50,12 +50,22 @@ export class PracticeService {
       }
 
       // join session room to receive room updates
-      client.join(session.id);
+      await client.join(session.id);
 
       // set user id and session id as socket data
       client.data.userId = user.uid;
       client.data.sessionId = session.id;
 
+      server
+        .in(session.id)
+        .fetchSockets()
+        .then((sockets) => {
+          if (sockets.length > 1) {
+            // if room is already full emit start session event
+            client.emit("session:started");
+          }
+        });
+        
       // TODO: maybe can choose what to do according to disconnecting reason
       client.on("disconnecting", () => {
         this.handleSocketDisconnecting(client, server);
@@ -73,6 +83,10 @@ export class PracticeService {
         ...joinSessionDto,
       })
       .pipe(map((session) => ({ sessionId: session.id })));
+  }
+
+  async handleSessionStarted(sessionId: string, server: Server) {
+    server.to(sessionId).emit("session:started");
   }
 
   async handleSessionRemoved(sessionId: string, server: Server) {

@@ -7,13 +7,12 @@ import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
 import { useSocket } from "common/hooks/use-socket.hook";
 import getInitials from "common/utils/get-initials.util";
 
+import CountdownTimer from "features/matching/CountdownTimer";
 import {
   selectMatching,
   setHasTimeout,
   setIsMatching,
 } from "features/matching/matching.slice";
-
-import CountdownTimer from "../matching/CountdownTimer";
 
 export default function MatchingModal() {
   const dispatch = useAppDispatch();

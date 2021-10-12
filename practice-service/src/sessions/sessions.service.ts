@@ -56,6 +56,7 @@ export class SessionsService {
     const { userId } = joinSessionDto;
     session.allowedUserIds = [...session.allowedUserIds, userId];
     session.status = Status.InProgress;
+    this.client.emit("session:started", session.id);
     return this.sessionsRepository.save(session);
   }
 
@@ -77,7 +78,7 @@ export class SessionsService {
       .where("session.id = :id", { id })
       .andWhere("session.status = :status", { status: Status.InProgress })
       .getOne();
-      
+
     return result;
   }
 
