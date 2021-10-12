@@ -7,6 +7,7 @@ import { CronJob } from "cron";
 import { QuestionsService } from "src/questions/questions.service";
 import { Repository } from "typeorm";
 
+import * as postgresErrorCodes from "../common/constants/postgres-error-codes.json";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { Session, Status } from "./entities/session.entity";
 
@@ -59,21 +60,21 @@ export class SessionsService {
     return this.sessionsRepository.save(session);
   }
 
-  findOneByUser(userId: string) {
+  findOneUnclosedSession(userId: string) {
     return this.sessionsRepository
       .createQueryBuilder("session")
       .where("session.allowedUserIds @> (:userId)", {
         userId: [userId],
       })
+      .andWhere("session.status != :status", { status: Status.Closed })
       .getOne();
   }
 
   async join(joinSessionDto: JoinSessionDto) {
     const { difficulty, userId } = joinSessionDto;
 
-    const isUserInExistingSession = await this.findOneByUser(userId);
-
-    if (!!isUserInExistingSession) {
+    const isUserInUnclosedSession = await this.findOneUnclosedSession(userId);
+    if (!!isUserInUnclosedSession) {
       throw new RpcException({
         statusCode: HttpStatus.BAD_REQUEST,
         message: "You are already in an existing practice session!",
@@ -93,6 +94,43 @@ export class SessionsService {
       return this.create(joinSessionDto);
     } else {
       return this.joinExisting(existingSession, joinSessionDto);
+    }
+  }
+
+  async handleSessionDisconnect(
+    sessionId: string,
+    isAnotherUserInSession: boolean
+  ) {
+    try {
+      const session = await this.sessionsRepository
+        .createQueryBuilder("session")
+        .where("session.id = :sessionId", {
+          sessionId,
+        })
+        .getOne();
+
+      if (!session) {
+        return;
+      }
+
+      if (session.status === Status.Open) {
+        // delete session if user disconnects even before anyone has joined the room
+        await this.sessionsRepository.remove(session);
+      } else if (
+        session.status === Status.InProgress &&
+        !isAnotherUserInSession
+      ) {
+        // close session if both users disconnected
+        // TODO: maybe don't close immediately (?)
+        session.status = Status.Closed;
+        await this.sessionsRepository.save(session);
+      }
+    } catch (e) {
+      if (postgresErrorCodes[e.code] === "invalid_text_representation") {
+        // ignore errors if we try to query session using non uuid id
+      } else {
+        throw new RpcException(e);
+      }
     }
   }
 }

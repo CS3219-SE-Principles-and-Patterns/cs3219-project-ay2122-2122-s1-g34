@@ -15,7 +15,17 @@ export class PracticeService {
     @Inject("PRACTICE_SERVICE") private client: ClientProxy
   ) {}
 
-  async handleSocketConnection(client: Socket) {
+  private handleSocketDisconnecting(client: Socket, server: Server) {
+    client.rooms.forEach(async (room) => {
+      const socketsInRoom = await server.in(room).fetchSockets();
+      this.client.emit("handleSessionDisconnect", {
+        sessionId: room,
+        isAnotherUserInSession: socketsInRoom.length >= 2,
+      });
+    });
+  }
+
+  async handleSocketConnection(client: Socket, server: Server) {
     try {
       // authenticate socket connection
       const user = await this.firebaseService.verifyIdToken(
@@ -27,7 +37,7 @@ export class PracticeService {
         throw new Error("User is not authorized!");
       }
       const session = await firstValueFrom(
-        this.client.send("findOneSessionByUser", user.uid)
+        this.client.send("findOneUnclosedSession", user.uid)
       );
       if (!session) {
         throw new Error("User has not joined any room yet.");
@@ -35,6 +45,12 @@ export class PracticeService {
 
       // join session room to receive room updates
       client.join(session.id);
+      client.data.userId = user.uid;
+
+      // TODO: maybe can choose what to do according to disconnecting reason
+      client.on("disconnecting", () => {
+        this.handleSocketDisconnecting(client, server);
+      });
     } catch (e) {
       client.disconnect();
       throw new WsException(e?.message ?? "An unspecified error has occurred.");

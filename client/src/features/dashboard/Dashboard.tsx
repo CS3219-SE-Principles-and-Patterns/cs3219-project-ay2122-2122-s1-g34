@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 
 import BackdropSpinner from "common/components/BackdropSpinner";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
-import { useSocket } from "common/hooks/use-socket.hook";
+import { useSocket, useOnSocketDisconnect } from "common/hooks/use-socket.hook";
 
 import SignedInHeader from "features/auth/SignedInHeader";
 import { logout, selectUser } from "features/auth/user.slice";
@@ -27,6 +27,10 @@ export default function Dashboard() {
   const user = useAppSelector(selectUser);
   const { open } = useSnackbar();
   const { setSocket } = useSocket();
+  useOnSocketDisconnect(() => {
+    dispatch(setIsMatching(false));
+    setIsLoading(false);
+  });
 
   // TODO: replace dummy data
   const dayStreak = "3rd";

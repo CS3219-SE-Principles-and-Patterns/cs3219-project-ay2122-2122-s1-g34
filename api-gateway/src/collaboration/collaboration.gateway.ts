@@ -1,4 +1,3 @@
-import { Injectable } from "@nestjs/common";
 import {
   WebSocketGateway,
   OnGatewayConnection,
@@ -12,7 +11,6 @@ import { Socket, Server } from "socket.io";
 
 import { CollaborationService } from "./collaboration.service";
 
-@Injectable()
 @WebSocketGateway()
 export class CollaborationGateway
   implements OnGatewayConnection, OnGatewayDisconnect

@@ -4,6 +4,7 @@ import { Typography, Button, Box } from "@mui/material";
 import Modal from "common/components/Modal";
 import RotatingDiv from "common/components/RotatingDiv";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
+import { useSocket } from "common/hooks/use-socket.hook";
 import getInitials from "common/utils/get-initials.util";
 
 import {
@@ -17,6 +18,7 @@ import CountdownTimer from "../matching/CountdownTimer";
 export default function MatchingModal() {
   const dispatch = useAppDispatch();
   const matching = useAppSelector(selectMatching);
+  const { socket } = useSocket();
 
   const { isMatching, hasTimeout, matchedPeer } = matching;
 
@@ -113,7 +115,12 @@ export default function MatchingModal() {
                 textTransform: "none",
                 boxShadow: 0,
               }}
-              onClick={() => dispatch(setIsMatching(false))}
+              onClick={() => {
+                if (socket) {
+                  socket.disconnect();
+                }
+                dispatch(setIsMatching(false));
+              }}
             >
               {hasTimeout ? "Back" : "Cancel"}
             </Button>
