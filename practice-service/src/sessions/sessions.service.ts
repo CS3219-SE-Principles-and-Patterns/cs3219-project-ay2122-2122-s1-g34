@@ -42,7 +42,7 @@ export class SessionsService {
           .andWhere(`ARRAY_LENGTH("session"."allowedUserIds", 1) < 2`)
           .execute();
         if (deleteResult.affected !== 0) {
-          this.client.emit("session:removed", { sessionId: result.id });
+          this.client.emit("session:removed", result.id);
         }
       }
     );
@@ -64,7 +64,9 @@ export class SessionsService {
 
     const isUserInExistingSession = await this.sessionsRepository
       .createQueryBuilder("session")
-      .where(":userId = ANY(session.allowedUserIds)", { userId })
+      .where("session.allowedUserIds @> (:userId)", {
+        userId: [userId],
+      })
       .getOne();
 
     if (!!isUserInExistingSession) {

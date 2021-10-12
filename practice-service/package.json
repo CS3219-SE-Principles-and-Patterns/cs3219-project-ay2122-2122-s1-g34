@@ -17,7 +17,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "echo 'No e2e tests implemented yet.'",
-    "typeorm": "ts-node -P server/tsconfig.json ./node_modules/typeorm/cli.js --config server/src/ormconfig.ts",
+    "typeorm": "ts-node -P ./tsconfig.json ./node_modules/typeorm/cli.js --config ./src/ormconfig.ts",
     "typeorm:create": "npm run typeorm migration:create -- -n",
     "typeorm:generate": "npm run typeorm migration:generate -- -n",
     "typeorm:migrate": "npm run typeorm migration:run",
