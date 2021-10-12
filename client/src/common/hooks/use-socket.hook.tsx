@@ -1,15 +1,22 @@
 import React from "react";
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 
 export const Context = React.createContext<{
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined;
-}>({ socket: undefined });
-
-const socket = io();
+  setSocket: React.Dispatch<
+    React.SetStateAction<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>
+  >;
+}>({ socket: undefined, setSocket: () => {} });
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  return <Context.Provider value={{ socket }}>{children}</Context.Provider>;
+  const [socket, setSocket] = React.useState<Socket>();
+
+  return (
+    <Context.Provider value={{ socket, setSocket }}>
+      {children}
+    </Context.Provider>
+  );
 };
 
 export function useSocket() {

@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 
 import { PracticeController } from "./practice.controller";
+import { PracticeGateway } from "./practice.gateway";
 import { PracticeService } from "./practice.service";
 
 @Module({
@@ -18,6 +19,6 @@ import { PracticeService } from "./practice.service";
     ]),
   ],
   controllers: [PracticeController],
-  providers: [PracticeService],
+  providers: [PracticeGateway, PracticeService],
 })
 export class PracticeModule {}
