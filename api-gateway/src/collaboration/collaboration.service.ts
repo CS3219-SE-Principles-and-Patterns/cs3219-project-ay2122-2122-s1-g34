@@ -26,7 +26,7 @@ export class CollaborationService {
 
   handleCollaboration(client: Socket, message: string) {
     this.natsClient.emit("collaboration:message", {
-      roomName: "monacco",
+      roomName: client.data.sessionId,
       socketId: client.id,
       message,
     });
@@ -35,9 +35,7 @@ export class CollaborationService {
   async handleSend(payload: CollaborationPayload, server: Server) {
     const sockets = await server.in(payload.roomName).fetchSockets();
     sockets.forEach((socket) => {
-      if (socket.id === payload.socketId) {
-        socket.emit("collaboration", payload.message);
-      }
+      socket.emit("collaboration", payload.message);
     });
   }
 }
