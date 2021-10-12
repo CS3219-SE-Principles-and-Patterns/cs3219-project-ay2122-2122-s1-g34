@@ -8,11 +8,6 @@ import { SessionsService } from "./sessions.service";
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 
-  @MessagePattern("findOneSession")
-  findOneSession(@Payload() id: string) {
-    return this.sessionsService.findOne(id);
-  }
-
   @MessagePattern("joinSession")
   join(@Payload() joinSessionDto: JoinSessionDto) {
     return this.sessionsService.join(joinSessionDto);
@@ -21,6 +16,11 @@ export class SessionsController {
   @MessagePattern("findOneUnclosedSession")
   findOneUnclosedSession(@Payload() userId: string) {
     return this.sessionsService.findOneUnclosedSession(userId);
+  }
+
+  @MessagePattern("findOneInProgressSession")
+  findOneInProgressSession(@Payload() id: string) {
+    return this.sessionsService.findOneInProgressSession(id);
   }
 
   /**
