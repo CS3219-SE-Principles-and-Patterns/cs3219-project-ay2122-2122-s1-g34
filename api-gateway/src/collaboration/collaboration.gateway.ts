@@ -23,7 +23,7 @@ export class CollaborationGateway
   constructor(private readonly collaborationService: CollaborationService) {}
 
   handleConnection(client: Socket) {
-    this.collaborationService.handleConnection(client);
+    // this.collaborationService.handleConnection(client);
   }
 
   handleDisconnect(client: Socket) {

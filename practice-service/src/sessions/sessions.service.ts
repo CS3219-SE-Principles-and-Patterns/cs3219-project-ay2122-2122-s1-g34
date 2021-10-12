@@ -59,15 +59,19 @@ export class SessionsService {
     return this.sessionsRepository.save(session);
   }
 
-  async join(joinSessionDto: JoinSessionDto) {
-    const { difficulty, userId } = joinSessionDto;
-
-    const isUserInExistingSession = await this.sessionsRepository
+  findOneByUser(userId: string) {
+    return this.sessionsRepository
       .createQueryBuilder("session")
       .where("session.allowedUserIds @> (:userId)", {
         userId: [userId],
       })
       .getOne();
+  }
+
+  async join(joinSessionDto: JoinSessionDto) {
+    const { difficulty, userId } = joinSessionDto;
+
+    const isUserInExistingSession = await this.findOneByUser(userId);
 
     if (!!isUserInExistingSession) {
       throw new RpcException({
