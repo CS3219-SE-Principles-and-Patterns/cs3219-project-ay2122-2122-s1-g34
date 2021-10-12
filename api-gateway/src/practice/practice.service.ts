@@ -4,6 +4,7 @@ import { WsException } from "@nestjs/websockets";
 import * as admin from "firebase-admin";
 import { firstValueFrom, map } from "rxjs";
 import { Server, Socket } from "socket.io";
+import { CollaborationService } from "src/collaboration/collaboration.service";
 
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
@@ -12,16 +13,21 @@ import { JoinSessionDto } from "./dto/join-session.dto";
 export class PracticeService {
   constructor(
     private readonly firebaseService: FirebaseService,
-    @Inject("PRACTICE_SERVICE") private client: ClientProxy
+    private readonly collaborationService: CollaborationService,
+    @Inject("PRACTICE_SERVICE") private natsClient: ClientProxy
   ) {}
 
-  private handleSocketDisconnecting(client: Socket, server: Server) {
-    client.rooms.forEach(async (room) => {
-      const socketsInRoom = await server.in(room).fetchSockets();
-      this.client.emit("handleSessionDisconnect", {
-        sessionId: room,
-        isAnotherUserInSession: socketsInRoom.length >= 2,
-      });
+  private async handleSocketDisconnecting(client: Socket, server: Server) {
+    const room = client.data.sessionId;
+    const socketsInRoom = await server.in(room).fetchSockets();
+
+    // disconnect collaboration
+    this.collaborationService.handleDisconnecting(client);
+
+    // disconnect practice session
+    this.natsClient.emit("handleSessionDisconnecting", {
+      sessionId: room,
+      isAnotherUserInSession: socketsInRoom.length >= 2,
     });
   }
 
@@ -37,7 +43,7 @@ export class PracticeService {
         throw new Error("User is not authorized!");
       }
       const session = await firstValueFrom(
-        this.client.send("findOneUnclosedSession", user.uid)
+        this.natsClient.send("findOneUnclosedSession", user.uid)
       );
       if (!session) {
         throw new Error("User has not joined any room yet.");
@@ -45,7 +51,10 @@ export class PracticeService {
 
       // join session room to receive room updates
       client.join(session.id);
+
+      // set user id and session id as socket data
       client.data.userId = user.uid;
+      client.data.sessionId = session.id;
 
       // TODO: maybe can choose what to do according to disconnecting reason
       client.on("disconnecting", () => {
@@ -58,7 +67,7 @@ export class PracticeService {
   }
 
   joinSession(user: admin.auth.DecodedIdToken, joinSessionDto: JoinSessionDto) {
-    return this.client
+    return this.natsClient
       .send("joinSession", {
         userId: user.uid,
         ...joinSessionDto,
@@ -71,5 +80,10 @@ export class PracticeService {
     sockets.forEach((socket) => {
       socket.disconnect();
     });
+  }
+
+  async practiceInit(client: Socket) {
+    this.collaborationService.handleConnection(client);
+    return this.natsClient.send("findOneSession", client.data.sessionId);
   }
 }

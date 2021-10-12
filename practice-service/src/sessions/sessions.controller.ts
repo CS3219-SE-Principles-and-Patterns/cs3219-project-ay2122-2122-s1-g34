@@ -8,6 +8,11 @@ import { SessionsService } from "./sessions.service";
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 
+  @MessagePattern("findOneSession")
+  findOneSession(@Payload() id: string) {
+    return this.sessionsService.findOne(id);
+  }
+
   @MessagePattern("joinSession")
   join(@Payload() joinSessionDto: JoinSessionDto) {
     return this.sessionsService.join(joinSessionDto);
@@ -23,8 +28,8 @@ export class SessionsController {
    * @param userId user leaving the session
    * @param isAnotherUserInSession is there another user remaining in the session
    */
-  @EventPattern("handleSessionDisconnect")
-  handleSessionDisconnect(
+  @EventPattern("handleSessionDisconnecting")
+  handleSessionDisconnecting(
     @Payload()
     {
       sessionId,
@@ -34,7 +39,7 @@ export class SessionsController {
       isAnotherUserInSession: boolean;
     }
   ) {
-    return this.sessionsService.handleSessionDisconnect(
+    return this.sessionsService.handleSessionDisconnecting(
       sessionId,
       isAnotherUserInSession
     );

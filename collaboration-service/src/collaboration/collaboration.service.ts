@@ -45,7 +45,7 @@ export class CollaborationService {
     }
   }
 
-  handleDisconnect(payload: CollaborationPayload) {
+  handleDisconnecting(payload: CollaborationPayload) {
     const { roomName, socketId } = payload;
     const doc = getYDoc(roomName, this.client);
     closeConn(doc, socketId);
