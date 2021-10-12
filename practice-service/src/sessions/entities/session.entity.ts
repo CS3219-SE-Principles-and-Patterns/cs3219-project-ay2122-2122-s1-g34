@@ -10,9 +10,9 @@ import {
 import { Difficulty, Question } from "../../questions/entities/question.entity";
 
 export enum Status {
-  Open = "open",
-  InProgress = "in-progress",
-  Closed = "closed",
+  Open = "open", // open with one user waiting for another to join
+  InProgress = "in-progress", // 2 users currently partaking in the session
+  Closed = "closed", // session has ended
 }
 
 @Entity()

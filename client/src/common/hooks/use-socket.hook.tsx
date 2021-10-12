@@ -22,3 +22,13 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 export function useSocket() {
   return React.useContext(Context);
 }
+
+export function useOnSocketDisconnect(onDisconnect: () => void) {
+  const { socket } = useSocket();
+
+  React.useEffect(() => {
+    if (socket) {
+      socket.on("disconnect", onDisconnect);
+    }
+  }, [socket, onDisconnect]);
+}

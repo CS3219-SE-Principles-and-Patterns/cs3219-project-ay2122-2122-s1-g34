@@ -13,7 +13,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.token;
+    const token = request?.headers?.token;
 
     try {
       const user = await this.firebaseService.verifyIdToken(token);

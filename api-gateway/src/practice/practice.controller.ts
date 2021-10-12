@@ -10,7 +10,6 @@ import { PracticeService } from "./practice.service";
 
 @Controller({ path: "practice", version: "1" })
 @ApiHeader({ name: "token" })
-@UseGuards(AuthGuard)
 export class PracticeController {
   constructor(
     private readonly practiceGateway: PracticeGateway,
@@ -18,6 +17,7 @@ export class PracticeController {
   ) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   joinSession(@User() user, @Body() joinSessionDto: JoinSessionDto) {
     return this.practiceService.joinSession(user, joinSessionDto);
   }
