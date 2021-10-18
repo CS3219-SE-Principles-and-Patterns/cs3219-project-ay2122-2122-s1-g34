@@ -62,7 +62,10 @@ export default function Register() {
             "Account created! You are now signed in to your new account!",
         });
       } catch (e: any) {
-        if (e?.response?.data?.message) {
+        if (
+          e?.response?.data?.message &&
+          typeof e?.response?.data?.message === "object"
+        ) {
           Object.entries(e.response.data.message).forEach(
             ([property, value]) => {
               setFieldError(property, value as string);
