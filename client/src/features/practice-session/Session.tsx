@@ -17,6 +17,7 @@ import {
   selectPracticeSession,
   setQuestion,
   setHasClickedOnSubmitSession,
+  setHasEnded,
 } from "./practice-session.slice";
 
 export default function Session() {
@@ -25,7 +26,7 @@ export default function Session() {
   const practiceSession = useAppSelector(selectPracticeSession);
   const { setSocket } = useSocket();
 
-  const { question, isUserOffline } = practiceSession;
+  const { question, isPeerOffline, isUserOffline } = practiceSession;
 
   useEffect(() => {
     if (user) {
@@ -44,6 +45,14 @@ export default function Session() {
       }
     });
   });
+
+  useEffect(() => {
+    // Bring user to session ended page if
+    // both users go offline
+    if (isPeerOffline && isUserOffline) {
+      dispatch(setHasEnded(true));
+    }
+  }, [dispatch, isPeerOffline, isUserOffline]);
 
   if (!question) {
     return <LinearProgress />;

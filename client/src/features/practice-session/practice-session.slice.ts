@@ -45,7 +45,7 @@ const initialState: PracticeSession = {
     hasClickedOnLeaveSession: false,
     hasClickedOnSubmitSession: false,
     isPeerOffline: false,
-    isUserOffline: true,
+    isUserOffline: false,
 };
 
 
