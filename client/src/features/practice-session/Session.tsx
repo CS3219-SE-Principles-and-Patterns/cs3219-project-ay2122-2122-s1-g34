@@ -7,6 +7,7 @@ import { useSocket, useOnSocketConnect } from "common/hooks/use-socket.hook";
 
 import { selectUser } from "features/auth/user.slice";
 import CollaborativeEditor from "features/collaboration/CollaborativeEditor";
+import { setIsMatching } from "features/matching/matching.slice";
 import ChatBox from "features/practice-session/ChatBox";
 import QuestionDisplay from "features/practice-session/QuestionDisplay";
 
@@ -53,6 +54,11 @@ export default function Session() {
       dispatch(setHasEnded(true));
     }
   }, [dispatch, isPeerOffline, isUserOffline]);
+
+  useEffect(() => {
+    // close is matching modal when user arrives on this page
+    dispatch(setIsMatching(false));
+  }, [dispatch]);
 
   if (!question) {
     return <LinearProgress />;

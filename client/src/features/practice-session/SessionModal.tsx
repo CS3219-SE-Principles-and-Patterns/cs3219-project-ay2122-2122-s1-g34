@@ -1,5 +1,5 @@
 import { Typography, Button, Box } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { useHistory, Link as RouterLink } from "react-router-dom";
 
 import Modal from "common/components/Modal";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
@@ -14,6 +14,7 @@ import {
 } from "./practice-session.slice";
 
 export default function SessionModal() {
+  const history = useHistory();
   const dispatch = useAppDispatch();
   const practiceSession = useAppSelector(selectPracticeSession);
 
@@ -114,8 +115,6 @@ export default function SessionModal() {
                 fontWeight: 600,
                 color: "blue.main",
               }}
-              component={RouterLink}
-              to="/"
               onClick={onClickResetSession}
             >
               Go back to dashboard
@@ -204,6 +203,7 @@ export default function SessionModal() {
 
   function onClickResetSession(): void {
     dispatch(resetSession());
+    history.push("/");
   }
 
   function onClickCancel() {
