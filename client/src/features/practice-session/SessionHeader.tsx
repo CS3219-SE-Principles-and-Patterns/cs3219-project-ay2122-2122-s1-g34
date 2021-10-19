@@ -17,6 +17,7 @@ export default function SessionHeader() {
     <Header>
       <Grid
         container
+        item
         xs={2}
         sx={{
           alignItems: "center",
