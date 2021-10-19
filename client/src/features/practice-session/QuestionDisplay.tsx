@@ -19,11 +19,11 @@ export default function QuestionDisplay({
         borderRadius: 3,
         borderWidth: 2,
         borderStyle: "solid",
-        borderColor: "#DB7D58",
+        borderColor: "orange.main",
         padding: 2,
       }}
     >
-      <Typography variant="h6">{question.title}</Typography>
+      <Typography variant="h6" fontWeight="600">Question: {question.title}</Typography>
       <Typography dangerouslySetInnerHTML={{ __html: question.questionHtml }} />
     </Box>
   );

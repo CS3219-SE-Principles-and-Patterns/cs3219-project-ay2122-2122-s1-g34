@@ -1,6 +1,7 @@
 import { Box, Container, Grid, Typography } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 import BackdropSpinner from "common/components/BackdropSpinner";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
@@ -147,7 +148,8 @@ export default function Dashboard() {
                   outlineColor={"violet"}
                   title={"Check out the Leaderboard"}
                   subtitle={"Woah who is that?"}
-                  onCardClick={navigateToLeaderboard}
+                  component={RouterLink}
+                  to="/leaderboard"
                 />
               </Grid>
 
@@ -156,7 +158,8 @@ export default function Dashboard() {
                   outlineColor={"blue"}
                   title={"Review past attempts"}
                   subtitle={"What was it again?"}
-                  onCardClick={navigateToPastAttempts}
+                  component={RouterLink}
+                  to="/past-attempts"
                 />
               </Grid>
 
@@ -210,15 +213,7 @@ export default function Dashboard() {
   }
 
   function continueOngoingTask() {
-    // TODO: navigate to leaderboard
+    // TODO: navigate to practice session
     console.log("Continues on-going task");
-  }
-
-  function navigateToLeaderboard() {
-    history.push("/leaderboard");
-  }
-
-  function navigateToPastAttempts() {
-    history.push("/past-attempts");
   }
 }
