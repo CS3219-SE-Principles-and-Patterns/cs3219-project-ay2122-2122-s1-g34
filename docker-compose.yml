@@ -54,6 +54,14 @@ services:
     ports:
       - 5432:5432
 
+  code-runner-service:
+    restart: always
+    image: node:14-alpine
+    command: sh -c "yarn install && yarn start:dev"
+    working_dir: /app
+    volumes:
+      - ./code-runner-service:/app
+
   nats:
     restart: always
     entrypoint: "/nats-server -c nats-server.conf -DV"

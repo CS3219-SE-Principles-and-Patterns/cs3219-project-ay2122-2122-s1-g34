@@ -74,12 +74,7 @@ export default function CollaborativeEditor({
       <Typography variant="h6" fontWeight="600" sx={{ paddingBottom: 2 }}>
         Code
       </Typography>
-      <Editor
-        height="100%"
-        defaultLanguage="javascript"
-        onMount={handleEditorDidMount}
-      />
-
+      <Editor defaultLanguage="javascript" onMount={handleEditorDidMount} />
       {hasSubmitButton && (
         <Button
           variant="contained"
