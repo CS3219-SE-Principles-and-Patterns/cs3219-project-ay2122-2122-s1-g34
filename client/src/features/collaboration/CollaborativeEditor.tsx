@@ -1,11 +1,15 @@
-import Editor from "@monaco-editor/react";
+import Editor, { OnMount } from "@monaco-editor/react";
 import { Box, BoxProps, Typography, Button } from "@mui/material";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import React from "react";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
 import { useSocket } from "common/hooks/use-socket.hook";
 
 import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
+
+import RunCodeButton from "./RunCodeButton";
 
 interface CollaborativeEditorProps extends BoxProps {
   hasSubmitButton?: boolean;
@@ -20,8 +24,12 @@ export default function CollaborativeEditor({
   onSubmitButtonClick,
   ...rest
 }: CollaborativeEditorProps) {
+  const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const { socket } = useSocket();
-  function handleEditorDidMount(editor: any) {
+
+  const handleEditorDidMount: OnMount = (editor) => {
+    editorRef.current = editor;
+
     if (socket) {
       const ydocument = new Y.Doc();
       const provider = new SocketIoProvider(socket, ydocument);
@@ -35,7 +43,7 @@ export default function CollaborativeEditor({
         provider.awareness
       );
     }
-  }
+  };
 
   return (
     <Box
@@ -71,9 +79,19 @@ export default function CollaborativeEditor({
         },
       }}
     >
-      <Typography variant="h6" fontWeight="600" sx={{ paddingBottom: 2 }}>
-        Code
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingBottom: 2,
+        }}
+      >
+        <Typography variant="h6" fontWeight="600">
+          Code
+        </Typography>
+        <RunCodeButton editorRef={editorRef} />
+      </Box>
       <Editor defaultLanguage="javascript" onMount={handleEditorDidMount} />
       {hasSubmitButton && (
         <Button

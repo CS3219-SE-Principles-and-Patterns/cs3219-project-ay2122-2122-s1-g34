@@ -6,7 +6,7 @@ import { firstValueFrom } from "rxjs";
 export class CodeRunnerService {
   constructor(@Inject("CODE_RUNNER_SERVICE") private natsClient: ClientProxy) {}
 
-  runCode(code: string) {
-    return firstValueFrom(this.natsClient.send("runCode", code));
+  async runCode(code: string) {
+    return await firstValueFrom(this.natsClient.send("runCode", code));
   }
 }
