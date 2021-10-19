@@ -1,8 +1,6 @@
 import { CssBaseline, Box } from "@mui/material";
 import { Switch, Route } from "react-router-dom";
 
-import TopRainbowBar from "common/components/TopRainbowBar";
-
 import Login from "features/auth/Login";
 import PrivateRoute from "features/auth/PrivateRoute";
 import Register from "features/auth/Register";
@@ -26,7 +24,6 @@ export default function App() {
       <CssBaseline />
       <Box sx={{ minHeight: "100%", display: "flex", flexDirection: "column" }}>
         <AppSnackbar />
-        <TopRainbowBar />
         <Switch>
           <Route path="/login">
             <Login />
@@ -34,6 +31,7 @@ export default function App() {
           <Route path="/register">
             <Register />
           </Route>
+
           <PrivateRoute path="/past-attempts">
             <PastAttempts />
           </PrivateRoute>

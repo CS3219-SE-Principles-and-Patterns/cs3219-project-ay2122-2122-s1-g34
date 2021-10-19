@@ -1,18 +1,26 @@
 import Editor from "@monaco-editor/react";
-import { Box, BoxProps } from "@mui/material";
+import { Box, BoxProps, Typography, Button } from "@mui/material";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
+import { useAppDispatch } from "common/hooks/use-redux.hook";
 import { useSocket } from "common/hooks/use-socket.hook";
 
 import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
 
-interface CollaborativeEditorProps extends BoxProps {}
+import { setHasClickedOnSubmitSession } from "../practice-session/practice-session.slice";
+
+interface CollaborativeEditorProps extends BoxProps {
+  hasSaveButton?: boolean;
+}
 
 export default function CollaborativeEditor({
   sx,
+  hasSaveButton,
   ...rest
 }: CollaborativeEditorProps) {
+  const dispatch = useAppDispatch();
+
   const { socket } = useSocket();
   function handleEditorDidMount(editor: any) {
     if (socket) {
@@ -38,8 +46,11 @@ export default function CollaborativeEditor({
         borderRadius: 3,
         borderWidth: 2,
         borderStyle: "solid",
-        borderColor: "#5F4BA8",
+        borderColor: "violet.main",
         padding: 2,
+        display: "flex",
+        position: "relative",
+        flexDirection: "column",
         "& .yRemoteSelection": {
           backgroundColor: "rgb(250, 129, 0, .5)",
         },
@@ -61,11 +72,41 @@ export default function CollaborativeEditor({
         },
       }}
     >
+      <Typography variant="h6" fontWeight="600" sx={{ paddingBottom: 2 }}>
+        Code
+      </Typography>
       <Editor
         height="100%"
         defaultLanguage="javascript"
         onMount={handleEditorDidMount}
       />
+
+      {hasSaveButton && (
+        <Button
+          variant="contained"
+          size="small"
+          sx={{
+            position: "absolute",
+            borderRadius: 40,
+            paddingX: 2,
+            fontSize: 18,
+            fontWeight: "regular",
+            color: "lightGray.main",
+            backgroundColor: "green.main",
+            textTransform: "none",
+            bottom: 10,
+            right: 10,
+            zIndex: 50,
+          }}
+          onClick={onSaveButtonClick}
+        >
+          Submit
+        </Button>
+      )}
     </Box>
   );
+
+  function onSaveButtonClick() {
+    dispatch(setHasClickedOnSubmitSession(true));
+  }
 }
