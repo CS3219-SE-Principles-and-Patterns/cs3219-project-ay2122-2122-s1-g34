@@ -5,6 +5,7 @@ import snackbarReducer from "features/snackbar/snackbar.slice";
 import matchingReducer from "features/matching/matching.slice";
 import pastAttemptsReducer from "features/past-attempts/past-attempts.slice";
 import leaderboardReducer from "features/leaderboard/leaderboard.slice";
+import practiceSessionReducer from "features/practice-session/practice-session.slice";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     matching: matchingReducer,
     pastAttempts: pastAttemptsReducer,
     leaderboard: leaderboardReducer,
+    practiceSession: practiceSessionReducer,
   },
 });
 

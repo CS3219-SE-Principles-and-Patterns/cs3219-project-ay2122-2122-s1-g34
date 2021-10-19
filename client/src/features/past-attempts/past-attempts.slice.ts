@@ -20,12 +20,11 @@ const dummyData: Attempt[] = [
     peer: "John Tan",
     points: 1,
   },
-
   {
     question: "Eulerian Cycles",
     difficulty: "hard",
     status: "completed",
-    peer: "Kum Su Hyun",
+    peer: "Kim Su Hyun",
     points: 3,
   },
 ];

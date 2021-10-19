@@ -5,7 +5,9 @@ interface DashboardCardProps {
   title: string;
   subtitle: string;
   disabled?: boolean;
-  onCardClick: () => void;
+  onCardClick?: () => void;
+  component?: any;
+  to?: string;
 }
 export default function DashboardCard({
   outlineColor,
@@ -13,6 +15,8 @@ export default function DashboardCard({
   subtitle,
   disabled = false,
   onCardClick,
+  component,
+  to,
 }: DashboardCardProps) {
   const themePalette = useTheme().palette;
 
@@ -37,9 +41,12 @@ export default function DashboardCard({
         ...disabledStyle,
         justifyContent: "center",
         cursor: "pointer",
+        textDecoration: "none",
       }}
       borderColor={`${outlineColor}.main`}
       onClick={onCardClick}
+      component={component}
+      to={to}
     >
       <Typography gutterBottom fontWeight={"bold"}>
         {title}
