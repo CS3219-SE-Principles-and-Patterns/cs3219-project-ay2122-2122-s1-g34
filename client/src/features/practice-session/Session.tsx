@@ -13,7 +13,11 @@ import QuestionDisplay from "features/practice-session/QuestionDisplay";
 import DisconnectedSnackbar from "./DisconnectedSnackbar";
 import SessionHeader from "./SessionHeader";
 import SessionModal from "./SessionModal";
-import { selectPracticeSession, setQuestion } from "./practice-session.slice";
+import {
+  selectPracticeSession,
+  setQuestion,
+  setHasClickedOnSubmitSession,
+} from "./practice-session.slice";
 
 export default function Session() {
   const dispatch = useAppDispatch();
@@ -21,7 +25,7 @@ export default function Session() {
   const practiceSession = useAppSelector(selectPracticeSession);
   const { setSocket } = useSocket();
 
-  const { question } = practiceSession;
+  const { question, isUserOffline } = practiceSession;
 
   useEffect(() => {
     if (user) {
@@ -73,7 +77,11 @@ export default function Session() {
         >
           <CollaborativeEditor
             sx={{ flexBasis: "60%", marginRight: 2 }}
-            hasSaveButton
+            hasSubmitButton
+            isSubmitButtonDisabled={isUserOffline}
+            onSubmitButtonClick={() =>
+              dispatch(setHasClickedOnSubmitSession(true))
+            }
           />
           <ChatBox sx={{ flex: 1 }} />
         </Box>

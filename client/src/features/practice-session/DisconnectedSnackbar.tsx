@@ -10,11 +10,15 @@ export default function DisconnectedSnackbar() {
   const practiceSession = useAppSelector(selectPracticeSession);
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
-  const { isPeerOffline, peerTwo } = practiceSession;
+  const { isPeerOffline, peerTwo, isUserOffline } = practiceSession;
 
   useEffect(() => {
     setIsSnackbarOpen(isPeerOffline);
   }, [isPeerOffline]);
+
+  useEffect(() => {
+    setIsSnackbarOpen(isUserOffline);
+  }, [isUserOffline]);
 
   return (
     <Snackbar open={isSnackbarOpen}>
@@ -29,7 +33,8 @@ export default function DisconnectedSnackbar() {
         }}
       >
         <Typography sx={{ marginRight: 2 }}>
-          {`${peerTwo?.displayName}'s connection is unstable.`}
+          {isUserOffline ? "Your" : `${peerTwo?.displayName}'s`} connection is
+          unstable.
           <br />
           Trying to re-connect...
         </Typography>

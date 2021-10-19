@@ -33,6 +33,7 @@ export interface PracticeSession {
     hasClickedOnLeaveSession: boolean;
     hasClickedOnSubmitSession: boolean;
     isPeerOffline: boolean;
+    isUserOffline: boolean;
 }
 
 const initialState: PracticeSession = {
@@ -44,6 +45,7 @@ const initialState: PracticeSession = {
     hasClickedOnLeaveSession: false,
     hasClickedOnSubmitSession: false,
     isPeerOffline: false,
+    isUserOffline: true,
 };
 
 
@@ -73,13 +75,16 @@ export const practiceSessionSlice = createSlice({
         setIsPeerOffline: (states, action: PayloadAction<boolean>) => {
             states.isPeerOffline = action.payload;
         },
+        setIsUserOffline: (states, action: PayloadAction<boolean>) => {
+            states.isUserOffline = action.payload;
+        },
         resetSession: (states) => {
             states = initialState;
         }
     },
   });
   
-  export const { setPeers, setQuestion, setHasEnded, setHasSubmitted, setHasClickedOnLeaveSession, setHasClickedOnSubmitSession, resetSession, setIsPeerOffline } = practiceSessionSlice.actions;
+  export const { setPeers, setQuestion, setHasEnded, setHasSubmitted, setHasClickedOnLeaveSession, setHasClickedOnSubmitSession, resetSession, setIsPeerOffline, setIsUserOffline } = practiceSessionSlice.actions;
   
   export const selectPracticeSession = (state: RootState) => state.practiceSession;
   

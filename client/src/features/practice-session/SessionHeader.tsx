@@ -12,7 +12,7 @@ export default function SessionHeader() {
   const dispatch = useAppDispatch();
   const practiceSession = useAppSelector(selectPracticeSession);
 
-  const { peerOne, peerTwo, isPeerOffline } = practiceSession;
+  const { peerOne, peerTwo, isPeerOffline, isUserOffline } = practiceSession;
   return (
     <Header>
       <Grid
@@ -42,7 +42,7 @@ export default function SessionHeader() {
             <Typography
               fontWeight="600"
               variant="h6"
-              sx={{ color: "purple.main" }}
+              sx={{ color: isUserOffline ? "gray.main" : "purple.main" }}
             >
               {peerOne?.displayName}
             </Typography>
@@ -81,6 +81,7 @@ export default function SessionHeader() {
           textTransform: "none",
         }}
         onClick={onLeaveSessionClick}
+        disabled={isUserOffline}
       >
         Leave Session
       </Button>

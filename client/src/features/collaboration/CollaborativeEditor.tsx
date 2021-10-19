@@ -3,24 +3,23 @@ import { Box, BoxProps, Typography, Button } from "@mui/material";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
-import { useAppDispatch } from "common/hooks/use-redux.hook";
 import { useSocket } from "common/hooks/use-socket.hook";
 
 import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
 
-import { setHasClickedOnSubmitSession } from "../practice-session/practice-session.slice";
-
 interface CollaborativeEditorProps extends BoxProps {
-  hasSaveButton?: boolean;
+  hasSubmitButton?: boolean;
+  isSubmitButtonDisabled?: boolean;
+  onSubmitButtonClick?: () => void;
 }
 
 export default function CollaborativeEditor({
   sx,
-  hasSaveButton,
+  hasSubmitButton,
+  isSubmitButtonDisabled,
+  onSubmitButtonClick,
   ...rest
 }: CollaborativeEditorProps) {
-  const dispatch = useAppDispatch();
-
   const { socket } = useSocket();
   function handleEditorDidMount(editor: any) {
     if (socket) {
@@ -81,7 +80,7 @@ export default function CollaborativeEditor({
         onMount={handleEditorDidMount}
       />
 
-      {hasSaveButton && (
+      {hasSubmitButton && (
         <Button
           variant="contained"
           size="small"
@@ -98,15 +97,12 @@ export default function CollaborativeEditor({
             right: 10,
             zIndex: 50,
           }}
-          onClick={onSaveButtonClick}
+          onClick={onSubmitButtonClick}
+          disabled={isSubmitButtonDisabled}
         >
           Submit
         </Button>
       )}
     </Box>
   );
-
-  function onSaveButtonClick() {
-    dispatch(setHasClickedOnSubmitSession(true));
-  }
 }
