@@ -3,14 +3,24 @@ import { VM } from "vm2";
 
 @Injectable()
 export class CodeRunnerService {
-  private readonly vm: VM;
-
-  constructor() {
-    const timeout = 1000 * 10; // 10 second timeout
-    this.vm = new VM({ timeout, eval: false, wasm: false, fixAsync: true });
-  }
-
   runCode(code: string) {
-    return this.vm.run(code);
+    const timeout = 1000 * 10; // 10 second timeout
+    const vm = new VM({
+      timeout,
+      eval: false,
+      wasm: false,
+      fixAsync: true,
+    });
+
+    try {
+      const result = vm.run(code);
+      if (!result) {
+        return "undefined";
+      } else {
+        return JSON.stringify(result, null, 2);
+      }
+    } catch (e) {
+      return e.message;
+    }
   }
 }
