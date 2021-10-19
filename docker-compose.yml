@@ -11,6 +11,7 @@ services:
       - ./client:/app
 
   api-gateway:
+    restart: always
     build: ./api-gateway
     command: sh -c "yarn install && yarn start:dev & firebase emulators:start --import=./firebase-emulator-data --export-on-exit"
     ports:
@@ -26,6 +27,7 @@ services:
       PORT: 5000
 
   collaboration-service:
+    restart: always
     image: node:14-alpine
     command: sh -c "yarn install && yarn start:dev"
     working_dir: /app
@@ -35,6 +37,7 @@ services:
       NODE_ENV: development
 
   practice-service:
+    restart: always
     image: node:14-alpine
     command: sh -c "yarn install && yarn run seed && yarn start:dev"
     working_dir: /app
@@ -52,6 +55,7 @@ services:
       - 5432:5432
 
   nats:
+    restart: always
     entrypoint: "/nats-server -c nats-server.conf -DV"
     image: nats
     logging:

@@ -1,4 +1,4 @@
-import { Box, BoxProps } from "@mui/material";
+import { Box, BoxProps, Typography } from "@mui/material";
 
 interface ChatBoxProps extends BoxProps {}
 
@@ -11,9 +11,13 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
         borderRadius: 3,
         borderWidth: 2,
         borderStyle: "solid",
-        borderColor: "#67A0AC",
+        borderColor: "blue.main",
         padding: 2,
       }}
-    ></Box>
+    >
+      <Typography variant="h6" fontWeight="600">
+        Chat
+      </Typography>
+    </Box>
   );
 }
