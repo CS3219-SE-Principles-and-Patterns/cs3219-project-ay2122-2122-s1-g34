@@ -5,27 +5,6 @@ import { RootState } from "app/store";
 import { UserData } from "features/auth/map-user-data.util";
 import { Question } from "features/practice-session/question.interface";
 
-// TODO: Replace dummy data
-const dummyData: UserData[] = [
-  {
-    id: "1234",
-    displayName: "Nancy Lim",
-    email: "nancy@gmail.com",
-    token: "wwwwwww",
-  },
-  {
-    id: "12343333",
-    displayName: "John Tan",
-    email: "john@gmail.com",
-    token: "wwwwwww1111",
-  },
-];
-
-const dummyQuestion: Question = {
-  title: "Hello",
-  questionHtml: "helllllo",
-};
-
 export interface PracticeSession {
   question?: Question;
   peerOne?: UserData;
@@ -39,9 +18,6 @@ export interface PracticeSession {
 }
 
 const initialState: PracticeSession = {
-  // question: dummyQuestion,
-  // peerOne: dummyData[0],
-  // peerTwo: dummyData[1],
   hasEnded: false,
   hasSubmitted: false,
   hasClickedOnLeaveSession: false,
