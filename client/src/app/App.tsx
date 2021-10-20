@@ -1,6 +1,7 @@
 import { CssBaseline, Box } from "@mui/material";
 import { Switch, Route } from "react-router-dom";
 
+import Account from "features/auth/Account";
 import Login from "features/auth/Login";
 import PrivateRoute from "features/auth/PrivateRoute";
 import Register from "features/auth/Register";
@@ -40,6 +41,9 @@ export default function App() {
           </PrivateRoute>
           <PrivateRoute path="/session">
             <Session />
+          </PrivateRoute>
+          <PrivateRoute path="/account">
+            <Account />
           </PrivateRoute>
           <PrivateRoute path="/">
             <Dashboard />
