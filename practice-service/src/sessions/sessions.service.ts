@@ -61,6 +61,23 @@ export class SessionsService {
     return this.sessionsRepository.save(session);
   }
 
+  findAllClosedSessions(userId: string) {
+    return this.sessionsRepository
+      .createQueryBuilder("session")
+      .select([
+        "session.id",
+        "session.difficulty",
+        "session.allowedUserIds",
+        "question.title",
+      ])
+      .where("session.allowedUserIds @> (:userId)", {
+        userId: [userId],
+      })
+      .andWhere("session.status = :status", { status: Status.Closed })
+      .leftJoin("session.question", "question")
+      .getMany();
+  }
+
   findOneUnclosedSession(userId: string) {
     return this.sessionsRepository
       .createQueryBuilder("session")
