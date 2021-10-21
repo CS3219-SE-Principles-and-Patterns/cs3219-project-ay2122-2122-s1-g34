@@ -13,7 +13,7 @@ import { selectPracticeSession } from "features/practice-session/practice-sessio
 
 import RunCodeButton from "./RunCodeButton";
 
-interface CollaborativeEditorProps extends BoxProps {
+export interface CollaborativeEditorProps extends BoxProps {
   hasSubmitButton?: boolean;
   isSubmitButtonDisabled?: boolean;
   onSubmitButtonClick?: () => void;

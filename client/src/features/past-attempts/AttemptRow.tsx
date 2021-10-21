@@ -1,8 +1,7 @@
 import { Button, Grid, Typography, styled } from "@mui/material";
+import { Link, useRouteMatch } from "react-router-dom";
 
-import { useAppDispatch } from "common/hooks/use-redux.hook";
-
-import { Attempt, setCurrentAttempt } from "./past-attempts.slice";
+import { PastAttempt } from "features/past-attempts/past-attempt.interface";
 
 const HeaderGrid = styled(Grid)({
   marginBottom: 1,
@@ -25,11 +24,11 @@ const AttemptGrid = styled(Grid)({
 });
 
 interface AttemptRowProps {
-  attempt?: Attempt;
+  attempt?: PastAttempt;
 }
 
 export default function AttemptRow({ attempt }: AttemptRowProps) {
-  const dispatch = useAppDispatch();
+  const { url } = useRouteMatch();
 
   if (!attempt) {
     return (
@@ -47,28 +46,26 @@ export default function AttemptRow({ attempt }: AttemptRowProps) {
           },
         }}
       >
-        <HeaderGrid item xs={3}>
+        <HeaderGrid item xs={4}>
           <Typography fontWeight="500">Question</Typography>
         </HeaderGrid>
         <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Difficulty</Typography>
         </HeaderGrid>
-        <HeaderGrid item xs={2}>
-          <Typography fontWeight="500">Status</Typography>
-        </HeaderGrid>
-        <HeaderGrid item xs={2}>
+        <HeaderGrid item xs={4}>
           <Typography fontWeight="500">Peer</Typography>
         </HeaderGrid>
-        <HeaderGrid item xs={2}>
+        {/* TODO: Add points system if have time */}
+        {/* <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Points</Typography>
-        </HeaderGrid>
+        </HeaderGrid> */}
         <HeaderGrid item xs={2}>
           <Typography fontWeight="500">Review</Typography>
         </HeaderGrid>
       </Grid>
     );
   } else {
-    const { question, difficulty, status, peer, points } = attempt;
+    const { question, difficulty, id, peerDisplayName } = attempt;
 
     const difficultyColor =
       difficulty === "easy"
@@ -99,8 +96,8 @@ export default function AttemptRow({ attempt }: AttemptRowProps) {
           },
         }}
       >
-        <AttemptGrid item xs={3}>
-          <Typography>{question}</Typography>
+        <AttemptGrid item xs={4}>
+          <Typography>{question.title}</Typography>
         </AttemptGrid>
         <AttemptGrid item xs={2}>
           <Typography
@@ -111,44 +108,28 @@ export default function AttemptRow({ attempt }: AttemptRowProps) {
             {difficulty}
           </Typography>
         </AttemptGrid>
-        <AttemptGrid item xs={2}>
-          <Typography
-            sx={{
-              textTransform: "capitalize",
-            }}
-          >
-            {status}
-          </Typography>
+        <AttemptGrid item xs={4}>
+          <Typography>{peerDisplayName}</Typography>
         </AttemptGrid>
-        <AttemptGrid item xs={2}>
-          <Typography>{peer}</Typography>
-        </AttemptGrid>
-        <AttemptGrid item xs={2}>
+        {/* TODO: Add points system if have time */}
+        {/* <AttemptGrid item xs={2}>
           <Typography>{points}</Typography>
-        </AttemptGrid>
+        </AttemptGrid> */}
         <AttemptGrid item xs={2}>
           <Button
             variant="contained"
-            onClick={onClickReview}
             sx={{
               textTransform: "none",
               borderRadius: 10,
               backgroundColor: "orange.main",
             }}
+            component={Link}
+            to={`${url}/${id}`}
           >
             Review
           </Button>
         </AttemptGrid>
       </Grid>
     );
-  }
-
-  function onClickReview() {
-    console.log("On click review");
-    // TODO: navigate to review page
-
-    if (attempt) {
-      dispatch(setCurrentAttempt(attempt));
-    }
   }
 }

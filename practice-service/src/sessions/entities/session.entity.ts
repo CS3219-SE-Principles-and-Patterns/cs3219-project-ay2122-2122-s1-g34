@@ -36,8 +36,11 @@ export class Session {
   @Column({ type: "enum", enum: Status, default: Status.Open })
   status: Status;
 
-  @Column({ nullable: true })
-  code?: string;
+  @Column({ default: "" })
+  code: string;
+
+  @Column({ type: "jsonb", default: {} })
+  notes: { [userId: string]: string };
 
   @CreateDateColumn()
   createdAt: Date;

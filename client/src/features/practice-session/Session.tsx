@@ -2,6 +2,7 @@ import { Box, Container, LinearProgress } from "@mui/material";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
+import QuestionDisplay from "common/components/QuestionDisplay";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
 import { useSocket, useOnSocketConnect } from "common/hooks/use-socket.hook";
 
@@ -9,18 +10,16 @@ import { selectUser } from "features/auth/user.slice";
 import CollaborativeEditor from "features/collaboration/CollaborativeEditor";
 import { setIsMatching } from "features/matching/matching.slice";
 import ChatBox from "features/practice-session/ChatBox";
-import QuestionDisplay from "features/practice-session/QuestionDisplay";
-
-import DisconnectedSnackbar from "./DisconnectedSnackbar";
-import SessionHeader from "./SessionHeader";
-import SessionModal from "./SessionModal";
+import DisconnectedSnackbar from "features/practice-session/DisconnectedSnackbar";
+import SessionHeader from "features/practice-session/SessionHeader";
+import SessionModal from "features/practice-session/SessionModal";
 import {
   selectPracticeSession,
   setQuestion,
   setHasClickedOnSubmitSession,
   setHasEnded,
   setRoomId,
-} from "./practice-session.slice";
+} from "features/practice-session/practice-session.slice";
 
 export default function Session() {
   const dispatch = useAppDispatch();
@@ -68,8 +67,8 @@ export default function Session() {
 
   return (
     <>
-      <SessionHeader />
       <SessionModal />
+      <SessionHeader />
       <Container
         fixed
         sx={{
@@ -102,8 +101,8 @@ export default function Session() {
           />
           <ChatBox sx={{ flex: 1 }} />
         </Box>
-        <DisconnectedSnackbar />
       </Container>
+      <DisconnectedSnackbar />
     </>
   );
 }
