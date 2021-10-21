@@ -102,4 +102,10 @@ export class PracticeService {
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
     );
   }
+
+  findAll(user: admin.auth.DecodedIdToken) {
+    return firstValueFrom(
+      this.natsClient.send("findAllClosedSessions", user.uid)
+    );
+  }
 }

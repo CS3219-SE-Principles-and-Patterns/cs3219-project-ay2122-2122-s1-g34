@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards, Get } from "@nestjs/common";
 import { EventPattern } from "@nestjs/microservices";
 import { ApiHeader } from "@nestjs/swagger";
 import { AuthGuard } from "src/common/guards/auth.guard";
@@ -20,6 +20,12 @@ export class PracticeController {
   @UseGuards(AuthGuard)
   joinSession(@User() user, @Body() joinSessionDto: JoinSessionDto) {
     return this.practiceService.joinSession(user, joinSessionDto);
+  }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  findAll(@User() user) {
+    return this.practiceService.findAll(user);
   }
 
   @EventPattern("session:started")

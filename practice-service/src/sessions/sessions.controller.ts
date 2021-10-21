@@ -14,6 +14,11 @@ export class SessionsController {
     return this.sessionsService.join(joinSessionDto);
   }
 
+  @MessagePattern("findAllClosedSessions")
+  findAllClosedSessions(@Payload() userId: string) {
+    return this.sessionsService.findAllClosedSessions(userId);
+  }
+
   @MessagePattern("findOneUnclosedSession")
   findOneUnclosedSession(@Payload() userId: string) {
     return this.sessionsService.findOneUnclosedSession(userId);
