@@ -1,15 +1,17 @@
 import { LoadingButton } from "@mui/lab";
 import { Box, Container, Grid, Typography, Button } from "@mui/material";
+import { updateEmail, updateProfile } from "firebase/auth";
 import { useFormik } from "formik";
 import React from "react";
 import * as yup from "yup";
 
 import TextInput from "common/components/TextInput";
-import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
+import { useAppDispatch } from "common/hooks/use-redux.hook";
+import { auth } from "common/utils/firebase.util";
 
 import ChangePasswordDialog from "features/auth/ChangePasswordDialog";
 import SignedInHeader from "features/auth/SignedInHeader";
-import { selectUser } from "features/auth/user.slice";
+import { reload } from "features/auth/user.slice";
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 const validationSchema = yup.object({
@@ -21,23 +23,29 @@ const validationSchema = yup.object({
 });
 
 export default function Account() {
-  const user = useAppSelector(selectUser);
-  const { open } = useSnackbar();
   const [isChangingPassword, setIsChangingPassword] = React.useState(false);
+  const dispatch = useAppDispatch();
+  const user = auth.currentUser;
+  const { open } = useSnackbar();
 
   const formik = useFormik({
     initialValues: {
-      displayName: user ? user.displayName : "",
-      email: user ? user.email : "",
+      displayName: user ? user.displayName ?? "" : "",
+      email: user ? user.email ?? "" : "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { setFieldError }) => {
       try {
-        // TODO: Update user
-
-        open({
-          message: "Update successful!",
-        });
+        if (user) {
+          await updateEmail(user, values.email);
+          await updateProfile(user, { displayName: values.displayName });
+          await dispatch(reload());
+          open({
+            message: "Update successful!",
+          });
+        } else {
+          console.error("User is not logged in");
+        }
       } catch (e: any) {
         if (
           e?.response?.data?.message &&
@@ -81,6 +89,8 @@ export default function Account() {
         <Box
           maxWidth="sm"
           sx={{ mt: 1, flexGrow: 1, alignItems: "flex-start", marginY: 4 }}
+          component="form"
+          onSubmit={formik.handleSubmit}
         >
           <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -147,7 +157,6 @@ export default function Account() {
                 backgroundColor: "green.main",
                 textTransform: "none",
               }}
-              disabled={!formik.dirty}
               loading={formik.isSubmitting}
             >
               Save
