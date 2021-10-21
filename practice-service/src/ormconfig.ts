@@ -15,7 +15,7 @@ const config: ConnectionOptions = {
   password: data.POSTGRES_PASSWORD,
   database: data.POSTGRES_USER,
   entities: [Question, Session],
-  synchronize: true,
+  synchronize: process.env.NODE_ENV === "development",
   migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
   cli: {
     // Location of migration should be inside src folder

@@ -1,5 +1,6 @@
 import { Person } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
+import { Link as BrowserRouter } from "react-router-dom";
 
 import Header from "common/components/Header";
 
@@ -14,15 +15,11 @@ export default function SignedInHeader() {
           height: 50,
           width: 50,
         }}
-        onClick={navigateToAccountPage}
+        component={BrowserRouter}
+        to={"/account"}
       >
         <Person sx={{ height: 34, width: 34, color: "black.main" }} />
       </IconButton>
     </Header>
   );
-
-  function navigateToAccountPage() {
-    console.log("Navigate to account page");
-    // TODO: Navigate to account page
-  }
 }
