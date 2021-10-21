@@ -36,6 +36,9 @@ export class Session {
   @Column({ type: "enum", enum: Status, default: Status.Open })
   status: Status;
 
+  @Column({ nullable: true })
+  code?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

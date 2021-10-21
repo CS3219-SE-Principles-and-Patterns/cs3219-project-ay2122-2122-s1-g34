@@ -8,49 +8,6 @@ import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
 import * as Y from "yjs";
 
-// disable gc when using snapshots!
-const gcEnabled = process.env.GC !== "false" && process.env.GC !== "0";
-const persistenceDir = process.env.YPERSISTENCE;
-
-let persistence: {
-  bindState: (arg0: string, arg1: SocketIoSharedDoc) => void;
-  writeState: (arg0: string, arg1: SocketIoSharedDoc) => Promise<any>;
-  provider: any;
-} | null = null;
-if (typeof persistenceDir === "string") {
-  console.info('Persisting documents to "' + persistenceDir + '"');
-  const LeveldbPersistence = require("y-leveldb").LeveldbPersistence;
-  const ldb = new LeveldbPersistence(persistenceDir);
-  persistence = {
-    provider: ldb,
-    bindState: async (docName, ydoc) => {
-      const persistedYdoc = await ldb.getYDoc(docName);
-      const newUpdates = Y.encodeStateAsUpdate(ydoc);
-      ldb.storeUpdate(docName, newUpdates);
-      Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
-      ydoc.on("update", (update) => {
-        ldb.storeUpdate(docName, update);
-      });
-    },
-    writeState: async (docName, ydoc) => {},
-  };
-}
-
-export const setPersistence = (
-  persistence_: {
-    bindState: (arg0: string, arg1: SocketIoSharedDoc) => void;
-    writeState: (arg0: string, arg1: SocketIoSharedDoc) => Promise<any>;
-    provider: any;
-  } | null
-) => {
-  persistence = persistence_;
-};
-
-export const getPersistence = (): null | {
-  bindState: (arg0: string, arg1: SocketIoSharedDoc) => void;
-  writeState: (arg0: string, arg1: SocketIoSharedDoc) => Promise<any>;
-} | null => persistence;
-
 // exporting docs so that others can use it
 export const docs: Map<string, SocketIoSharedDoc> = new Map();
 
@@ -77,7 +34,7 @@ class SocketIoSharedDoc extends Y.Doc {
   client: ClientProxy;
 
   constructor(name: string, client: ClientProxy) {
-    super({ gc: gcEnabled });
+    super({ gc: true });
     this.name = name;
     this.mux = mutex.createMutex();
 
@@ -136,9 +93,6 @@ export const getYDoc = (
   map.setIfUndefined(docs, docname, () => {
     const doc = new SocketIoSharedDoc(docname, client);
     doc.gc = gc;
-    if (persistence !== null) {
-      persistence.bindState(docname, doc);
-    }
     docs.set(docname, doc);
     return doc;
   });
@@ -170,7 +124,11 @@ export const messageListener = (
   }
 };
 
-export const closeConn = (doc: SocketIoSharedDoc, socketId: string) => {
+export const closeConn = (
+  doc: SocketIoSharedDoc,
+  socketId: string,
+  saveDocument: (code: string) => Promise<void>
+) => {
   if (doc.conns.has(socketId)) {
     const controlledIds = doc.conns.get(socketId);
     doc.conns.delete(socketId);
@@ -179,12 +137,14 @@ export const closeConn = (doc: SocketIoSharedDoc, socketId: string) => {
       Array.from(controlledIds),
       null
     );
-    if (doc.conns.size === 0 && persistence !== null) {
-      // if persisted, we store state and destroy ydocument
-      persistence.writeState(doc.name, doc).then(() => {
-        doc.destroy();
+    if (doc.conns.size === 0) {
+      // save doc contents before removing doc from memory
+      const xmlFragment = doc.getXmlFragment(doc.name);
+      const content = JSON.stringify(xmlFragment.toJSON());
+
+      saveDocument(content).then(() => {
+        docs.delete(doc.name);
       });
-      docs.delete(doc.name);
     }
   }
 };

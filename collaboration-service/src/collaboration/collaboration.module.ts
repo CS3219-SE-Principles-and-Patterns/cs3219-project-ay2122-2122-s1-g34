@@ -16,6 +16,16 @@ import { CollaborationService } from "./collaboration.service";
         },
       },
     ]),
+    ClientsModule.register([
+      {
+        name: "PRACTICE_SERVICE",
+        transport: Transport.NATS,
+        options: {
+          servers: ["nats://nats:4222"],
+          queue: "practice_queue",
+        },
+      },
+    ]),
   ],
   controllers: [CollaborationController],
   providers: [CollaborationService],
