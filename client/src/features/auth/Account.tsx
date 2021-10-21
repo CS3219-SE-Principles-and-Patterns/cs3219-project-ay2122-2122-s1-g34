@@ -1,15 +1,16 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Container, Grid, Typography } from "@mui/material";
+import { Box, Container, Grid, Typography, Button } from "@mui/material";
 import { useFormik } from "formik";
+import React from "react";
 import * as yup from "yup";
 
+import TextInput from "common/components/TextInput";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
 
+import ChangePasswordDialog from "features/auth/ChangePasswordDialog";
 import SignedInHeader from "features/auth/SignedInHeader";
 import { selectUser } from "features/auth/user.slice";
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
-
-import TextInput from "../../common/components/TextInput";
 
 const validationSchema = yup.object({
   displayName: yup.string().required("Display name is required"),
@@ -17,26 +18,17 @@ const validationSchema = yup.object({
     .string()
     .email("Enter a valid email")
     .required("Email is required"),
-  confirmPassword: yup.string().when("password", {
-    is: true,
-    then: yup
-      .string()
-      .oneOf([yup.ref("password"), null], "Passwords must match")
-      .required("Password confirmation is required"),
-  }),
 });
 
 export default function Account() {
-  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const { open } = useSnackbar();
+  const [isChangingPassword, setIsChangingPassword] = React.useState(false);
 
   const formik = useFormik({
     initialValues: {
       displayName: user ? user.displayName : "",
       email: user ? user.email : "",
-      password: "",
-      confirmPassword: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { setFieldError }) => {
@@ -69,6 +61,12 @@ export default function Account() {
   return (
     <>
       <SignedInHeader />
+      <ChangePasswordDialog
+        open={isChangingPassword}
+        handleClose={() => {
+          setIsChangingPassword(false);
+        }}
+      />
       <Container
         maxWidth="lg"
         disableGutters
@@ -119,66 +117,42 @@ export default function Account() {
                 disabled={formik.isSubmitting}
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextInput
-                required
-                fullWidth
-                label="New Password"
-                type="password"
-                autoComplete="password"
-                name="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.password && Boolean(formik.errors.password)
-                }
-                helperText={formik.touched.password && formik.errors.password}
-                disabled={formik.isSubmitting}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextInput
-                required
-                fullWidth
-                label="Confirm New Password"
-                type="password"
-                autoComplete="new-password"
-                name="confirmPassword"
-                value={formik.values.confirmPassword}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.confirmPassword &&
-                  Boolean(formik.errors.confirmPassword)
-                }
-                helperText={
-                  formik.touched.confirmPassword &&
-                  formik.errors.confirmPassword
-                }
-                disabled={formik.isSubmitting}
-              />
-            </Grid>
           </Grid>
-
-          <LoadingButton
-            variant="contained"
-            size="small"
-            type="submit"
+          <Box
             sx={{
-              borderRadius: 40,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
               marginTop: 4,
-              paddingX: 3,
-              paddingY: 1,
-              fontSize: 16,
-              fontWeight: "regular",
-              color: "lightGray.main",
-              backgroundColor: "green.main",
-              textTransform: "none",
             }}
-            disabled={!formik.dirty}
-            loading={formik.isSubmitting}
           >
-            Save
-          </LoadingButton>
+            <Button
+              onClick={() => {
+                setIsChangingPassword(true);
+              }}
+            >
+              Change password
+            </Button>
+            <LoadingButton
+              variant="contained"
+              size="small"
+              type="submit"
+              sx={{
+                borderRadius: 40,
+                paddingX: 3,
+                paddingY: 1,
+                fontSize: 16,
+                fontWeight: "regular",
+                color: "lightGray.main",
+                backgroundColor: "green.main",
+                textTransform: "none",
+              }}
+              disabled={!formik.dirty}
+              loading={formik.isSubmitting}
+            >
+              Save
+            </LoadingButton>
+          </Box>
         </Box>
       </Container>
     </>
