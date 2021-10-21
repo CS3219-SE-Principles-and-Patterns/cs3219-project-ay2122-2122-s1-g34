@@ -5,7 +5,6 @@ import * as admin from "firebase-admin";
 import { firstValueFrom, map } from "rxjs";
 import { Server, Socket } from "socket.io";
 import { CollaborationService } from "src/collaboration/collaboration.service";
-import { ChatService } from "src/chat/chat.service";
 
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
@@ -15,7 +14,6 @@ export class PracticeService {
   constructor(
     private readonly firebaseService: FirebaseService,
     private readonly collaborationService: CollaborationService,
-    private readonly chatService: ChatService,
     @Inject("PRACTICE_SERVICE") private natsClient: ClientProxy
   ) {}
 
@@ -25,9 +23,6 @@ export class PracticeService {
 
     // disconnect collaboration
     this.collaborationService.handleDisconnecting(client);
-
-    //disconnect chat?
-    this.chatService.handleDisconnecting(client);
 
     // disconnect practice session
     this.natsClient.emit("handleSessionDisconnecting", {
@@ -57,8 +52,9 @@ export class PracticeService {
       // join session room to receive room updates
       await client.join(session.id);
 
-      // set user id and session id as socket data
+      // set user id, display name, and session id as socket data
       client.data.userId = user.uid;
+      client.data.displayName = user.name;
       client.data.sessionId = session.id;
 
       server
@@ -70,8 +66,7 @@ export class PracticeService {
             client.emit("session:started");
           }
         });
-        
-      // TODO: maybe can choose what to do according to disconnecting reason
+
       client.on("disconnecting", () => {
         this.handleSocketDisconnecting(client, server);
       });
@@ -103,7 +98,6 @@ export class PracticeService {
 
   async practiceInit(client: Socket) {
     this.collaborationService.handleConnection(client);
-    this.chatService.handleConnection(client);
     return firstValueFrom(
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
     );
