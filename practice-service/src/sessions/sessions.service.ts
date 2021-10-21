@@ -8,6 +8,7 @@ import { QuestionsService } from "src/questions/questions.service";
 import { Repository } from "typeorm";
 
 import { JoinSessionDto } from "./dto/join-session.dto";
+import { UpdateSessionDto } from "./dto/update-session.dto";
 import { Session, Status } from "./entities/session.entity";
 
 @Injectable()
@@ -107,6 +108,11 @@ export class SessionsService {
     } else {
       return this.joinExisting(existingSession, joinSessionDto);
     }
+  }
+
+  update(updateSessionDto: UpdateSessionDto) {
+    const updatedSession = plainToClass(Session, updateSessionDto);
+    return this.sessionsRepository.save(updatedSession);
   }
 
   async handleSessionDisconnecting(

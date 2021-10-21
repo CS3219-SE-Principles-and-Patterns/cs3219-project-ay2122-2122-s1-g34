@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { toUint8Array } from "js-base64";
 import * as encoding from "lib0/encoding";
+import { firstValueFrom } from "rxjs";
 import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
 
@@ -17,12 +18,15 @@ import {
 
 @Injectable()
 export class CollaborationService {
-  constructor(@Inject("API_GATEWAY_SERVICE") private client: ClientProxy) {}
+  constructor(
+    @Inject("API_GATEWAY_SERVICE") private apiGatewayClient: ClientProxy,
+    @Inject("PRACTICE_SERVICE") private practiceClient: ClientProxy
+  ) {}
 
   handleConnection(payload: CollaborationPayload) {
     const { roomName, socketId } = payload;
 
-    const doc = getYDoc(roomName, this.client);
+    const doc = getYDoc(roomName, this.apiGatewayClient);
     doc.conns.set(socketId, new Set());
 
     const encoder = encoding.createEncoder();
@@ -47,13 +51,17 @@ export class CollaborationService {
 
   handleDisconnecting(payload: CollaborationPayload) {
     const { roomName, socketId } = payload;
-    const doc = getYDoc(roomName, this.client);
-    closeConn(doc, socketId);
+    const doc = getYDoc(roomName, this.apiGatewayClient);
+    closeConn(doc, socketId, (code: string) =>
+      firstValueFrom(
+        this.practiceClient.send("updateSession", { id: roomName, code })
+      )
+    );
   }
 
   handleCollaboration(payload: CollaborationPayload) {
     const { roomName, socketId, message } = payload;
-    const doc = getYDoc(roomName, this.client);
+    const doc = getYDoc(roomName, this.apiGatewayClient);
     messageListener(socketId, doc, toUint8Array(message));
   }
 }
