@@ -52,8 +52,9 @@ export class PracticeService {
       // join session room to receive room updates
       await client.join(session.id);
 
-      // set user id and session id as socket data
+      // set user id, display name, and session id as socket data
       client.data.userId = user.uid;
+      client.data.displayName = user.name;
       client.data.sessionId = session.id;
 
       server
@@ -65,8 +66,7 @@ export class PracticeService {
             client.emit("session:started");
           }
         });
-        
-      // TODO: maybe can choose what to do according to disconnecting reason
+
       client.on("disconnecting", () => {
         this.handleSocketDisconnecting(client, server);
       });
