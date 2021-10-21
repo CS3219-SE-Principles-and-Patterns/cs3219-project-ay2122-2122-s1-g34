@@ -5,6 +5,7 @@ import * as admin from "firebase-admin";
 import { firstValueFrom, map } from "rxjs";
 import { Server, Socket } from "socket.io";
 import { CollaborationService } from "src/collaboration/collaboration.service";
+import { ChatService } from "src/chat/chat.service";
 
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
@@ -14,6 +15,7 @@ export class PracticeService {
   constructor(
     private readonly firebaseService: FirebaseService,
     private readonly collaborationService: CollaborationService,
+    private readonly chatService: ChatService,
     @Inject("PRACTICE_SERVICE") private natsClient: ClientProxy
   ) {}
 
@@ -23,6 +25,9 @@ export class PracticeService {
 
     // disconnect collaboration
     this.collaborationService.handleDisconnecting(client);
+
+    //disconnect chat?
+    this.chatService.handleDisconnecting(client);
 
     // disconnect practice session
     this.natsClient.emit("handleSessionDisconnecting", {
@@ -98,6 +103,7 @@ export class PracticeService {
 
   async practiceInit(client: Socket) {
     this.collaborationService.handleConnection(client);
+    this.chatService.handleConnection(client);
     return firstValueFrom(
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
     );

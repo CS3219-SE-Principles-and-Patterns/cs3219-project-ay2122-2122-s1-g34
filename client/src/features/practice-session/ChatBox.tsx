@@ -20,36 +20,38 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
   const [typedMessage, setTypedMessage] = React.useState("");
 
   //dummy
-  const [messages, setMessages] = React.useState([{"username":"John Tan","message":"hi, how do you think we should start?"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
-  {"username":"John Tan","message":"yeskbalbgafa"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
-  {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"},
-  {"username":"John Tan","message":"hi, how do you think we should start?"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
-  {"username":"John Tan","message":"yeskbalbgafa"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
-  {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"},
-  {"username":"John Tan","message":"hi, how do you think we should start?"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
-  {"username":"John Tan","message":"yeskbalbgafa"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
-  {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"},
-  {"username":"John Tan","message":"hi, how do you think we should start?"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
-  {"username":"John Tan","message":"yeskbalbgafa"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
-  {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
-  {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"}]);
+  const [messages, setMessages] = React.useState([{"username":"firstuser","message":"testmessage"}]);
+  // ([{"username":"John Tan","message":"hi, how do you think we should start?"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
+  // {"username":"John Tan","message":"yeskbalbgafa"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
+  // {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"},
+  // {"username":"John Tan","message":"hi, how do you think we should start?"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
+  // {"username":"John Tan","message":"yeskbalbgafa"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
+  // {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"},
+  // {"username":"John Tan","message":"hi, how do you think we should start?"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
+  // {"username":"John Tan","message":"yeskbalbgafa"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
+  // {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"},
+  // {"username":"John Tan","message":"hi, how do you think we should start?"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem"},
+  // {"username":"John Tan","message":"yeskbalbgafa"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problem kabfbjksbvksncfkalbfelkgvasgvsga"},
+  // {"username":"John Tan","message":"i think we should start with breaking down the problemsgvsa sbegeagsdb"},
+  // {"username":"Alice Lee","message":"i think we should start with breaking down the problemsefaefjkafbkjfbskflabfaklf"}]);
 
   const postMessage = () => {
-    messages.push({"username":userDisplayName,"message":typedMessage});
-    setMessages(messages);
-    // socket?.emit("chat:send_message",{"userDisplayName":userDisplayName,"message":typedMessage});
+    //messages.push({"username":userDisplayName,"message":typedMessage});
+    //setMessages(messages);
+    socket?.emit("chat:send_message",{"username":userDisplayName,"message":typedMessage});
 		setTypedMessage("");
+    scrollToBottom();
 	}
 
   const Messages = Array.from(messages).map((onemessage) => {
@@ -88,12 +90,12 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
     messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  useEffect(scrollToBottom, [messages]);
+  useEffect(scrollToBottom, [{Messages}]);
 
-  // socket?.on("chat:receive_message",(payload)=>{
-  //   messages.push(payload.message);
-  //   setMessages(messages);
-  // }); 
+  socket?.on("chat:receive_message",(payload)=>{
+    messages.push(payload.message);
+    setMessages(messages);
+  }); 
 
   return (
     <Box
@@ -135,8 +137,11 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 0,
+                      },
+                      "& .MuiOutlinedInput-notchedOutline":
+                      {
                         borderLeft:0,
-                        borderRight:0,
+                        borderRight:0
                       },
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                         {

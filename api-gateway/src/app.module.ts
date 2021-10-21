@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 
 import { CodeRunnerModule } from "./code-runner/code-runner.module";
 import { CollaborationModule } from "./collaboration/collaboration.module";
+import { ChatModule } from "./chat/chat.module";
 import { FirebaseModule } from "./firebase/firebase.module";
 import { PracticeModule } from "./practice/practice.module";
 import { UsersModule } from "./users/users.module";
@@ -15,6 +16,10 @@ import { UsersModule } from "./users/users.module";
     FirebaseModule,
     PracticeModule,
     UsersModule,
+    ChatModule
   ],
 })
 export class AppModule {}
+
+
+
