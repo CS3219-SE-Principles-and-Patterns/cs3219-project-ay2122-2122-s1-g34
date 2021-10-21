@@ -6,6 +6,7 @@ import { UserData } from "features/auth/map-user-data.util";
 import { Question } from "features/practice-session/question.interface";
 
 export interface PracticeSession {
+  roomId?: string;
   question?: Question;
   peerOne?: UserData;
   peerTwo?: UserData;
@@ -33,6 +34,9 @@ export const practiceSessionSlice = createSlice({
     setPeers: (states, action: PayloadAction<UserData[]>) => {
       states.peerOne = action.payload[0];
       states.peerTwo = action.payload[1];
+    },
+    setRoomId: (states, action: PayloadAction<string>) => {
+      states.roomId = action.payload;
     },
     setQuestion: (states, action: PayloadAction<Question>) => {
       states.question = action.payload;
@@ -63,6 +67,7 @@ export const practiceSessionSlice = createSlice({
 
 export const {
   setPeers,
+  setRoomId,
   setQuestion,
   setHasEnded,
   setHasSubmitted,
