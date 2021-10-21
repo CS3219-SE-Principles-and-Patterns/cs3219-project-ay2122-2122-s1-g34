@@ -2,11 +2,12 @@ import { Button, Typography, Grid } from "@mui/material";
 
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
 
-import Header from "../../common/components/Header";
 import {
   selectPracticeSession,
   setHasClickedOnLeaveSession,
-} from "./practice-session.slice";
+} from "features/practice-session/practice-session.slice";
+
+import Header from "../../common/components/Header";
 
 export default function SessionHeader() {
   const dispatch = useAppDispatch();

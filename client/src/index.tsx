@@ -4,6 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
+import { SWRConfig } from "swr";
 
 import App from "app/App";
 import { store } from "app/store";
@@ -23,7 +24,16 @@ ReactDOM.render(
       <Router>
         <ThemeProvider theme={theme}>
           <SocketProvider>
-            <App />
+            <SWRConfig
+              value={{
+                fetcher: (url, token) =>
+                  axios
+                    .get(url, { headers: { token } })
+                    .then((res) => res.data),
+              }}
+            >
+              <App />
+            </SWRConfig>
           </SocketProvider>
         </ThemeProvider>
       </Router>

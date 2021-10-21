@@ -1,18 +1,29 @@
-import { Box, Container, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  LinearProgress,
+} from "@mui/material";
+import useSWR from "swr";
 
 import { useAppSelector } from "common/hooks/use-redux.hook";
 
 import SignedInHeader from "features/auth/SignedInHeader";
-
-import AttemptRow from "./AttemptRow";
-import { selectPastAttempts } from "./past-attempts.slice";
+import { selectUser } from "features/auth/user.slice";
+import AttemptRow from "features/past-attempts/AttemptRow";
+import { PastAttempt } from "features/past-attempts/past-attempt.interface";
 
 export default function PastAttempts() {
-  const pastAttempts = useAppSelector(selectPastAttempts);
+  const user = useAppSelector(selectUser);
+  const { data } = useSWR<PastAttempt[]>(
+    user ? ["/practice", user.token] : null
+  );
 
   return (
     <>
       <SignedInHeader />
+
       <Container maxWidth="lg" disableGutters sx={{ paddingY: 1 }}>
         <Box
           sx={{
@@ -27,35 +38,40 @@ export default function PastAttempts() {
             Review Past Attempts
           </Typography>
 
-          <Typography variant="h6" fontWeight={"600"} gutterBottom>
+          {/* TODO: Add points system if have time */}
+          {/* <Typography variant="h6" fontWeight={"600"} gutterBottom>
             Total points: {pastAttempts.totalPoints}
-          </Typography>
+          </Typography> */}
         </Box>
 
-        <Box sx={{ mt: 1, flexGrow: 1, textAlign: "center" }}>
-          <Grid
-            container
-            spacing={4}
-            columns={13}
-            sx={{
-              "&.MuiGrid-root": {
-                marginLeft: 0,
-                width: "100%",
-              },
-            }}
-          >
-            <AttemptRow />
-            {pastAttempts.pastAttempts ? (
-              pastAttempts.pastAttempts.map((attempt, i) => {
-                return <AttemptRow key={"attempt" + i} attempt={attempt} />;
-              })
-            ) : (
-              <Typography variant="h6" fontWeight={"600"}>
-                No attempt yet!
-              </Typography>
-            )}
-          </Grid>
-        </Box>
+        {!data ? (
+          <LinearProgress />
+        ) : (
+          <Box sx={{ mt: 1, flexGrow: 1, textAlign: "center" }}>
+            <Grid
+              container
+              spacing={4}
+              columns={13}
+              sx={{
+                "&.MuiGrid-root": {
+                  marginLeft: 0,
+                  width: "100%",
+                },
+              }}
+            >
+              <AttemptRow />
+              {data.length === 0 ? (
+                <Typography variant="h6" fontWeight={"600"}>
+                  No Attempts yet!
+                </Typography>
+              ) : (
+                data.map((attempt) => (
+                  <AttemptRow key={attempt.id} attempt={attempt} />
+                ))
+              )}
+            </Grid>
+          </Box>
+        )}
       </Container>
     </>
   );
