@@ -32,7 +32,6 @@ class SocketIoSharedDoc extends Y.Doc {
   conns: Map<string, Set<number>>;
   awareness: awarenessProtocol.Awareness;
   client: ClientProxy;
-  content: string;
 
   constructor(name: string, client: ClientProxy) {
     super({ gc: true });
@@ -83,12 +82,6 @@ class SocketIoSharedDoc extends Y.Doc {
     };
     this.awareness.on("update", awarenessChangeHandler);
     this.on("update", updateHandler);
-
-    // persist document content in memory
-    this.on("update", (_, __, doc: SocketIoSharedDoc) => {
-      const res = doc.getXmlFragment(doc.name);
-      doc.content = JSON.stringify(res.toJSON());
-    });
   }
 }
 
@@ -146,7 +139,10 @@ export const closeConn = (
     );
     if (doc.conns.size === 0) {
       // save doc contents before removing doc from memory
-      saveDocument(doc.content).then(() => {
+      const xmlFragment = doc.getXmlFragment(doc.name);
+      const content = JSON.stringify(xmlFragment.toJSON());
+
+      saveDocument(content).then(() => {
         docs.delete(doc.name);
       });
     }
