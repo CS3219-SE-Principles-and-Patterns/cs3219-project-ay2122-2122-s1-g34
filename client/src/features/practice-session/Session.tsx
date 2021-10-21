@@ -19,6 +19,7 @@ import {
   setQuestion,
   setHasClickedOnSubmitSession,
   setHasEnded,
+  setRoomId,
 } from "./practice-session.slice";
 
 export default function Session() {
@@ -42,6 +43,7 @@ export default function Session() {
   useOnSocketConnect((client) => {
     client.emit("practice:init", undefined, (response: any) => {
       if (response) {
+        dispatch(setRoomId(response.id));
         dispatch(setQuestion(response.question));
       }
     });
