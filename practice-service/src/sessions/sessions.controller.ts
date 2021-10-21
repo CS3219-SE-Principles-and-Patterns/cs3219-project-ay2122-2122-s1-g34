@@ -2,6 +2,7 @@ import { Controller } from "@nestjs/common";
 import { EventPattern, MessagePattern, Payload } from "@nestjs/microservices";
 
 import { JoinSessionDto } from "./dto/join-session.dto";
+import { UpdateSessionDto } from "./dto/update-session.dto";
 import { SessionsService } from "./sessions.service";
 
 @Controller()
@@ -21,6 +22,11 @@ export class SessionsController {
   @MessagePattern("findOneInProgressSession")
   findOneInProgressSession(@Payload() id: string) {
     return this.sessionsService.findOneInProgressSession(id);
+  }
+
+  @MessagePattern("updateSession")
+  update(@Payload() updateSessionDto: UpdateSessionDto) {
+    return this.sessionsService.update(updateSessionDto);
   }
 
   /**

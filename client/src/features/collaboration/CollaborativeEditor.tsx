@@ -5,9 +5,11 @@ import React from "react";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
+import { useAppSelector } from "common/hooks/use-redux.hook";
 import { useSocket } from "common/hooks/use-socket.hook";
 
 import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
+import { selectPracticeSession } from "features/practice-session/practice-session.slice";
 
 import RunCodeButton from "./RunCodeButton";
 
@@ -24,16 +26,18 @@ export default function CollaborativeEditor({
   onSubmitButtonClick,
   ...rest
 }: CollaborativeEditorProps) {
+  const practiceSession = useAppSelector(selectPracticeSession);
+
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const { socket } = useSocket();
 
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor;
 
-    if (socket) {
+    if (socket && practiceSession.roomId) {
       const ydocument = new Y.Doc();
       const provider = new SocketIoProvider(socket, ydocument);
-      const type = ydocument.getText("monaco");
+      const type = ydocument.getText(practiceSession.roomId);
 
       // Bind Yjs to the editor model
       new MonacoBinding(
@@ -42,6 +46,8 @@ export default function CollaborativeEditor({
         new Set([editor]),
         provider.awareness
       );
+    } else {
+      console.error("Not connected to socket or did not join a room yet");
     }
   };
 
