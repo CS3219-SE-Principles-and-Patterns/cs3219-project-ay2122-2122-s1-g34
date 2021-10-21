@@ -103,9 +103,30 @@ export class PracticeService {
     );
   }
 
-  findAll(user: admin.auth.DecodedIdToken) {
-    return firstValueFrom(
-      this.natsClient.send("findAllClosedSessions", user.uid)
-    );
+  async findAll(user: admin.auth.DecodedIdToken) {
+    const practices = await firstValueFrom<
+      {
+        id: string;
+        allowedUserIds: string[];
+        difficulty: string;
+        question: { title: string };
+      }[]
+    >(this.natsClient.send("findAllClosedSessions", user.uid));
+
+    // get peer display name
+    const practicesWithDisplayName = practices.map(async (practice) => {
+      const peerId = practice.allowedUserIds.find(
+        (userId) => userId !== user.uid
+      );
+      const peer = await this.firebaseService.getUserInformation(peerId);
+
+      delete practice.allowedUserIds;
+
+      return { ...practice, peerDisplayName: peer.displayName };
+    });
+
+    const resolved = await Promise.all(practicesWithDisplayName);
+
+    return resolved;
   }
 }
