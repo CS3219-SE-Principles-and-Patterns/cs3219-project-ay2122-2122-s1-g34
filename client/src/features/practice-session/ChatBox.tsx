@@ -121,12 +121,12 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
         borderRadius: 3,
         borderWidth: 2,
         borderStyle: "solid",
-        borderColor: "#67A0AC",
+        borderColor: "blue.main",
         padding: 2,
       }}
     >
       <Stack spacing={2}>
-        <Typography variant="h6" sx={{ marginBottom: 3 }}>
+        <Typography variant="h6" sx={{ marginBottom: 3, fontWeight: "bold" }}>
           Chat
         </Typography>
         <Box>
