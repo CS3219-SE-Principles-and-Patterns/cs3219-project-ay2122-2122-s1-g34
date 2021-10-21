@@ -14,7 +14,7 @@ export class CodeRunnerService {
 
     try {
       const result = vm.run(code);
-      if (!result) {
+      if (result === undefined) {
         return "undefined";
       } else {
         return JSON.stringify(result, null, 2);
