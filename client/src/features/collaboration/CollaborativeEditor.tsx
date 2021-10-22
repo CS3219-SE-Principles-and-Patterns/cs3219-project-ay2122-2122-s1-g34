@@ -13,10 +13,12 @@ import { selectPracticeSession } from "features/practice-session/practice-sessio
 
 import RunCodeButton from "./RunCodeButton";
 
-interface CollaborativeEditorProps extends BoxProps {
+export interface CollaborativeEditorProps extends BoxProps {
   hasSubmitButton?: boolean;
   isSubmitButtonDisabled?: boolean;
   onSubmitButtonClick?: () => void;
+  readOnly?: boolean;
+  defaultValue?: string;
 }
 
 export default function CollaborativeEditor({
@@ -24,6 +26,8 @@ export default function CollaborativeEditor({
   hasSubmitButton,
   isSubmitButtonDisabled,
   onSubmitButtonClick,
+  defaultValue,
+  readOnly,
   ...rest
 }: CollaborativeEditorProps) {
   const practiceSession = useAppSelector(selectPracticeSession);
@@ -34,7 +38,11 @@ export default function CollaborativeEditor({
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor;
 
-    if (socket && practiceSession.roomId) {
+    if (readOnly) {
+      editor.updateOptions({ readOnly: true });
+    }
+
+    if (socket && practiceSession.roomId && !readOnly) {
       const ydocument = new Y.Doc();
       const provider = new SocketIoProvider(socket, ydocument);
       const type = ydocument.getText(practiceSession.roomId);
@@ -46,8 +54,6 @@ export default function CollaborativeEditor({
         new Set([editor]),
         provider.awareness
       );
-    } else {
-      console.error("Not connected to socket or did not join a room yet");
     }
   };
 
@@ -98,7 +104,11 @@ export default function CollaborativeEditor({
         </Typography>
         <RunCodeButton editorRef={editorRef} />
       </Box>
-      <Editor defaultLanguage="javascript" onMount={handleEditorDidMount} />
+      <Editor
+        defaultLanguage="javascript"
+        onMount={handleEditorDidMount}
+        defaultValue={defaultValue}
+      />
       {hasSubmitButton && (
         <Button
           variant="contained"

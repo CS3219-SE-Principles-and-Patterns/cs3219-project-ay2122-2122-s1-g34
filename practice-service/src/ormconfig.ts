@@ -3,6 +3,7 @@ import * as fs from "fs";
 import { ConnectionOptions } from "typeorm";
 
 import { Question } from "./questions/entities/question.entity";
+import { SessionNote } from "./session-notes/entities/session-note.entity";
 import { Session } from "./sessions/entities/session.entity";
 
 const data = dotenv.parse(fs.readFileSync(".env"));
@@ -14,7 +15,7 @@ const config: ConnectionOptions = {
   username: data.POSTGRES_USER,
   password: data.POSTGRES_PASSWORD,
   database: data.POSTGRES_USER,
-  entities: [Question, Session],
+  entities: [Question, Session, SessionNote],
   synchronize: process.env.NODE_ENV === "development",
   migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
   cli: {

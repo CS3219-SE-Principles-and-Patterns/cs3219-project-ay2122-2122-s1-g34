@@ -7,6 +7,7 @@ import { CronJob } from "cron";
 import { QuestionsService } from "src/questions/questions.service";
 import { Repository } from "typeorm";
 
+import { FindOneSessionDto } from "./dto/find-one-session.dto";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { Session, Status } from "./entities/session.entity";
@@ -59,6 +60,48 @@ export class SessionsService {
     session.status = Status.InProgress;
     this.client.emit("session:started", session.id);
     return this.sessionsRepository.save(session);
+  }
+
+  findAllClosedSessions(userId: string) {
+    return this.sessionsRepository
+      .createQueryBuilder("session")
+      .select([
+        "session.id",
+        "session.difficulty",
+        "session.allowedUserIds",
+        "question.title",
+      ])
+      .where("session.allowedUserIds @> (:userId)", {
+        userId: [userId],
+      })
+      .andWhere("session.status = :status", { status: Status.Closed })
+      .leftJoin("session.question", "question")
+      .getMany();
+  }
+
+  findOneClosedSession(findOneSessionDto: FindOneSessionDto) {
+    return this.sessionsRepository
+      .createQueryBuilder("session")
+      .select([
+        "session.id",
+        "session.difficulty",
+        "session.allowedUserIds",
+        "session.code",
+        "question.title",
+        "question.questionHtml",
+        "question.answer",
+        "notes.note",
+      ])
+      .where("session.allowedUserIds @> (:userId)", {
+        userId: [findOneSessionDto.userId],
+      })
+      .andWhere("session.status = :status", { status: Status.Closed })
+      .andWhere("session.id = :id", { id: findOneSessionDto.id })
+      .leftJoin("session.question", "question")
+      .leftJoin("session.notes", "notes", "notes.userId = :currUserId", {
+        currUserId: findOneSessionDto.userId,
+      })
+      .getOne();
   }
 
   findOneUnclosedSession(userId: string) {

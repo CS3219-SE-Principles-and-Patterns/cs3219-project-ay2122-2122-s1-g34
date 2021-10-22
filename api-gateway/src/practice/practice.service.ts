@@ -8,6 +8,7 @@ import { CollaborationService } from "src/collaboration/collaboration.service";
 
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
+import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
 
 @Injectable()
 export class PracticeService {
@@ -100,6 +101,72 @@ export class PracticeService {
     this.collaborationService.handleConnection(client);
     return firstValueFrom(
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
+    );
+  }
+
+  async findAll(user: admin.auth.DecodedIdToken) {
+    const practices = await firstValueFrom<
+      {
+        id: string;
+        allowedUserIds: string[];
+        difficulty: string;
+        question: { title: string };
+      }[]
+    >(this.natsClient.send("findAllClosedSessions", user.uid));
+
+    // get peer display name
+    const practicesWithDisplayName = practices.map(async (practice) => {
+      const peerId = practice.allowedUserIds.find(
+        (userId) => userId !== user.uid
+      );
+      const peer = await this.firebaseService.getUserInformation(peerId);
+
+      delete practice.allowedUserIds;
+
+      return { ...practice, peerDisplayName: peer.displayName };
+    });
+
+    const resolved = await Promise.all(practicesWithDisplayName);
+
+    return resolved;
+  }
+
+  async findOne(user: admin.auth.DecodedIdToken, id: string) {
+    const practice = await firstValueFrom<{
+      id: string;
+      allowedUserIds: string[];
+      difficulty: string;
+      code: string;
+      question: {
+        title: string;
+        questionHtml: string;
+        answer: string;
+        notes: { note: string }[];
+      };
+    }>(this.natsClient.send("findOneClosedSession", { userId: user.uid, id }));
+
+    // get peer display name
+    const peerId = practice.allowedUserIds.find(
+      (userId) => userId !== user.uid
+    );
+    const peer = await this.firebaseService.getUserInformation(peerId);
+
+    delete practice.allowedUserIds;
+
+    return { ...practice, peerDisplayName: peer.displayName };
+  }
+
+  updateSessionNote(
+    user: admin.auth.DecodedIdToken,
+    sessionId: string,
+    updateSessionNoteDto: UpdateSessionNoteDto
+  ) {
+    return firstValueFrom(
+      this.natsClient.send("updateSessionNote", {
+        ...updateSessionNoteDto,
+        sessionId,
+        userId: user.uid,
+      })
     );
   }
 }

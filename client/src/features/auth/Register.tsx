@@ -45,7 +45,7 @@ export default function Register() {
     validationSchema: validationSchema,
     onSubmit: async (values, { setFieldError }) => {
       try {
-        const response = await axios.post("/users", {
+        const response = await axios.post<{ token: string }>("/users", {
           displayName: values.displayName,
           email: values.email,
           password: values.password1,

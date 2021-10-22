@@ -4,7 +4,6 @@ import * as encoding from "lib0/encoding";
 import * as mutex from "lib0/mutex";
 import { Observable } from "lib0/observable";
 import { Socket } from "socket.io-client";
-import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
 import * as Y from "yjs";
@@ -221,13 +220,13 @@ export class SocketIoProvider extends Observable<string> {
   ) => void;
   awareness: awarenessProtocol.Awareness;
   private _beforeUnloadHandler: () => void;
-  socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+  socket: Socket;
   wsconnected: boolean;
   wsconnecting: boolean;
   wsUnsuccessfulReconnects: number;
   shouldConnect: boolean;
 
-  constructor(socket: Socket<DefaultEventsMap, DefaultEventsMap>, doc: Y.Doc) {
+  constructor(socket: Socket, doc: Y.Doc) {
     super();
 
     this.shouldConnect = false;

@@ -1,8 +1,10 @@
+import { SessionNote } from "src/session-notes/entities/session-note.entity";
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -36,8 +38,11 @@ export class Session {
   @Column({ type: "enum", enum: Status, default: Status.Open })
   status: Status;
 
-  @Column({ nullable: true })
-  code?: string;
+  @Column({ default: "" })
+  code: string;
+
+  @OneToMany(() => SessionNote, (sessionNote) => sessionNote.session)
+  notes: SessionNote[];
 
   @CreateDateColumn()
   createdAt: Date;

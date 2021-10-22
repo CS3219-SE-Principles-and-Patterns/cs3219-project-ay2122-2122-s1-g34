@@ -1,4 +1,5 @@
 export interface Question {
-  title: string;
+  answer: string;
   questionHtml: string;
+  title: string;
 }

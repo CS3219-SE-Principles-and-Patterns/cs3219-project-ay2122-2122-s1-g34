@@ -36,6 +36,10 @@ export class FirebaseService {
     }
   }
 
+  getUserInformation(userId: string) {
+    return admin.auth().getUser(userId);
+  }
+
   createCustomToken(userId: string) {
     return admin.auth().createCustomToken(userId);
   }

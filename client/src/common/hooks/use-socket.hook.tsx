@@ -1,12 +1,9 @@
 import React from "react";
 import { Socket } from "socket.io-client";
-import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 
 const Context = React.createContext<{
-  socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined;
-  setSocket: React.Dispatch<
-    React.SetStateAction<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>
-  >;
+  socket: Socket | undefined;
+  setSocket: React.Dispatch<React.SetStateAction<Socket | undefined>>;
 }>({ socket: undefined, setSocket: () => {} });
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {

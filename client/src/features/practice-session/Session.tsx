@@ -1,4 +1,4 @@
-import { Box, Container, LinearProgress } from "@mui/material";
+import { LinearProgress } from "@mui/material";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
@@ -6,21 +6,19 @@ import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
 import { useSocket, useOnSocketConnect } from "common/hooks/use-socket.hook";
 
 import { selectUser } from "features/auth/user.slice";
-import CollaborativeEditor from "features/collaboration/CollaborativeEditor";
 import { setIsMatching } from "features/matching/matching.slice";
-import ChatBox from "features/practice-session/ChatBox";
-import QuestionDisplay from "features/practice-session/QuestionDisplay";
-
-import DisconnectedSnackbar from "./DisconnectedSnackbar";
-import SessionHeader from "./SessionHeader";
-import SessionModal from "./SessionModal";
+import DisconnectedSnackbar from "features/practice-session/DisconnectedSnackbar";
+import SessionHeader from "features/practice-session/SessionHeader";
+import SessionModal from "features/practice-session/SessionModal";
 import {
   selectPracticeSession,
   setQuestion,
   setHasClickedOnSubmitSession,
   setHasEnded,
   setRoomId,
-} from "./practice-session.slice";
+} from "features/practice-session/practice-session.slice";
+
+import SessionContainer from "./SessionContainer";
 
 export default function Session() {
   const dispatch = useAppDispatch();
@@ -68,42 +66,18 @@ export default function Session() {
 
   return (
     <>
-      <SessionHeader />
       <SessionModal />
-      <Container
-        fixed
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
+      <SessionHeader />
+      <SessionContainer
+        question={question}
+        CollaborativeEditorProps={{
+          hasSubmitButton: true,
+          isSubmitButtonDisabled: isUserOffline,
+          onSubmitButtonClick: () =>
+            dispatch(setHasClickedOnSubmitSession(true)),
         }}
-      >
-        <QuestionDisplay
-          sx={{
-            minHeight: "200px",
-            marginBottom: 2,
-          }}
-          question={question}
-        />
-        <Box
-          sx={{
-            display: "flex",
-            flex: 1,
-            minHeight: "620px",
-          }}
-        >
-          <CollaborativeEditor
-            sx={{ flexBasis: "60%", marginRight: 2 }}
-            hasSubmitButton
-            isSubmitButtonDisabled={isUserOffline}
-            onSubmitButtonClick={() =>
-              dispatch(setHasClickedOnSubmitSession(true))
-            }
-          />
-          <ChatBox sx={{ flex: 1 }} />
-        </Box>
-        <DisconnectedSnackbar />
-      </Container>
+      />
+      <DisconnectedSnackbar />
     </>
   );
 }

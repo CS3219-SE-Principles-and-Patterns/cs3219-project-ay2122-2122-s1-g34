@@ -1,6 +1,7 @@
 import { Controller } from "@nestjs/common";
 import { EventPattern, MessagePattern, Payload } from "@nestjs/microservices";
 
+import { FindOneSessionDto } from "./dto/find-one-session.dto";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { SessionsService } from "./sessions.service";
@@ -12,6 +13,16 @@ export class SessionsController {
   @MessagePattern("joinSession")
   join(@Payload() joinSessionDto: JoinSessionDto) {
     return this.sessionsService.join(joinSessionDto);
+  }
+
+  @MessagePattern("findAllClosedSessions")
+  findAllClosedSessions(@Payload() userId: string) {
+    return this.sessionsService.findAllClosedSessions(userId);
+  }
+
+  @MessagePattern("findOneClosedSession")
+  findOneClosedSession(@Payload() findOneSessionDto: FindOneSessionDto) {
+    return this.sessionsService.findOneClosedSession(findOneSessionDto);
   }
 
   @MessagePattern("findOneUnclosedSession")

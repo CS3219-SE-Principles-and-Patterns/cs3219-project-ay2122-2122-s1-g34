@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 
-import { CodeRunnerGateway } from "./code-runner.gateway";
+import { CodeRunnerController } from "./code-runner.controller";
 import { CodeRunnerService } from "./code-runner.service";
 
 @Module({
@@ -17,6 +17,7 @@ import { CodeRunnerService } from "./code-runner.service";
       },
     ]),
   ],
-  providers: [CodeRunnerGateway, CodeRunnerService],
+  controllers: [CodeRunnerController],
+  providers: [CodeRunnerService],
 })
 export class CodeRunnerModule {}
