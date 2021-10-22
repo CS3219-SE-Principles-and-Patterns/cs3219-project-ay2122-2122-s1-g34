@@ -2,6 +2,7 @@ import { LinearProgress } from "@mui/material";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
+import QuestionDisplay from "common/components/QuestionDisplay";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
 import { useSocket, useOnSocketConnect } from "common/hooks/use-socket.hook";
 
