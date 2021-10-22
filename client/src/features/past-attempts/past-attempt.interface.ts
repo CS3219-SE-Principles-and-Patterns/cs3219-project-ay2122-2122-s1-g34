@@ -1,3 +1,4 @@
+import { Notes } from "features/past-attempts/notes.type";
 import { Question } from "features/practice-session/question.interface";
 
 export interface PastAttempt {
@@ -6,4 +7,5 @@ export interface PastAttempt {
   difficulty: string;
   peerDisplayName: string;
   question: Question;
+  notes: Notes;
 }

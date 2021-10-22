@@ -1,25 +1,68 @@
 import {
   Box,
   BoxProps,
-  IconButton,
-  InputAdornment,
+  CircularProgress,
   Stack,
-  TextField,
   Typography,
+  styled,
 } from "@mui/material";
+import axios from "axios";
+import { debounce } from "lodash";
 import React from "react";
+import { useParams } from "react-router-dom";
 
-import { Question } from "features/practice-session/question.interface";
+import { useAppSelector } from "common/hooks/use-redux.hook";
+
+import { selectUser } from "features/auth/user.slice";
+import { Notes } from "features/past-attempts/notes.type";
+
+// debounced function to save note only 500ms after no updates
+const updateNote = debounce(
+  async (
+    note: string,
+    sessionId: string,
+    token: string,
+    onSave: () => void
+  ) => {
+    await axios.put(`/practice/${sessionId}`, { note }, { headers: { token } });
+    onSave();
+  },
+  500
+);
+
+const StyledTextArea = styled("textarea")({
+  resize: "none",
+  flex: 1,
+  border: "none",
+  outline: "none",
+  fontSize: "1rem",
+});
 
 interface SessionNotesProps extends BoxProps {
-  question: Question;
+  notes: Notes;
 }
 
 export default function SessionNotes({
-  question,
+  notes,
   sx,
   ...rest
 }: SessionNotesProps) {
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [note, setNote] = React.useState(notes?.[0]?.note ?? "");
+  const user = useAppSelector(selectUser);
+  const { attemptId } = useParams<{ attemptId: string }>();
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNote(e.target.value);
+    setIsSaving(true);
+
+    if (user) {
+      updateNote(note, attemptId, user.token, () => {
+        setIsSaving(false);
+      });
+    }
+  };
+
   return (
     <Box
       {...rest}
@@ -33,20 +76,21 @@ export default function SessionNotes({
       }}
     >
       <Stack sx={{ height: "100%" }}>
-        <Typography variant="h6" sx={{ marginBottom: 3, fontWeight: "bold" }}>
-          Notes
-        </Typography>
-        <Box
-          component="textarea"
-          autoFocus
-          sx={{
-            resize: "none",
-            flex: 1,
-            border: "none",
-            outline: "none",
-            fontSize: "1rem",
-          }}
-        />
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Typography variant="h6" sx={{ marginBottom: 3, fontWeight: "bold" }}>
+            Notes
+          </Typography>
+          {isSaving ? (
+            <CircularProgress
+              sx={{ width: "24px !important", height: "24px !important" }}
+            />
+          ) : (
+            <Typography sx={{ fontWeight: "bold" }} color="success.main">
+              Saved!
+            </Typography>
+          )}
+        </Box>
+        <StyledTextArea autoFocus value={note} onChange={onChange} />
       </Stack>
     </Box>
   );
