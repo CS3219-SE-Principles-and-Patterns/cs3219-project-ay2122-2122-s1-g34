@@ -8,6 +8,8 @@ import { selectUser } from "features/auth/user.slice";
 import { PastAttempt } from "features/past-attempts/past-attempt.interface";
 import SessionContainer from "features/practice-session/SessionContainer";
 
+import PastAttemptHeader from "./PastAttemptHeader";
+
 function parseJson(str: string) {
   try {
     const result = JSON.parse(str);
@@ -30,13 +32,16 @@ export default function PastAttemptPage() {
   }
 
   return (
-    <SessionContainer
-      question={data.question}
-      notes={data.notes}
-      CollaborativeEditorProps={{
-        readOnly: true,
-        defaultValue: parseJson(data.code),
-      }}
-    />
+    <>
+      <PastAttemptHeader peerDisplayName={data.peerDisplayName} />
+      <SessionContainer
+        question={data.question}
+        notes={data.notes}
+        CollaborativeEditorProps={{
+          readOnly: true,
+          defaultValue: parseJson(data.code),
+        }}
+      />
+    </>
   );
 }

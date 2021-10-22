@@ -60,9 +60,9 @@ export default function SessionNotes({
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNote(e.target.value);
-    setIsSaving(true);
 
     if (user) {
+      setIsSaving(true);
       updateNote(e.target.value, attemptId, user.token, () => {
         setIsSaving(false);
       });
