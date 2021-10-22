@@ -23,6 +23,7 @@ export default function PastAttemptPage() {
   return (
     <SessionContainer
       question={data.question}
+      showNotes
       CollaborativeEditorProps={{
         readOnly: true,
         defaultValue: JSON.parse(data.code),
