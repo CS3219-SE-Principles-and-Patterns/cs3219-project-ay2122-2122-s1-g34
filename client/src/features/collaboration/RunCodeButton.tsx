@@ -10,10 +10,13 @@ import {
   IconButton,
   IconButtonProps,
 } from "@mui/material";
+import axios from "axios";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import React from "react";
 
-import { useSocket } from "common/hooks/use-socket.hook";
+import { useAppSelector } from "common/hooks/use-redux.hook";
+
+import { selectUser } from "features/auth/user.slice";
 
 interface RunCodeButtonProps
   extends Omit<IconButtonProps, "onClick" | "disabled"> {
@@ -28,7 +31,7 @@ export default function RunCodeButton({
 }: RunCodeButtonProps) {
   const [loading, setLoading] = React.useState(false);
   const [runResult, setRunResult] = React.useState("");
-  const { socket } = useSocket();
+  const user = useAppSelector(selectUser);
 
   const closeRunResult = () => {
     setRunResult("");
@@ -69,17 +72,24 @@ export default function RunCodeButton({
       <IconButton
         {...rest}
         disabled={loading}
-        onClick={() => {
-          if (socket && editorRef.current) {
-            setLoading(true);
-            socket.emit(
-              "runCode",
-              editorRef.current.getValue(),
-              (result: string) => {
-                setLoading(false);
-                setRunResult(result);
-              }
-            );
+        onClick={async () => {
+          if (user && editorRef.current) {
+            try {
+              setLoading(true);
+              const response = await axios.post<string>(
+                "/code-runner",
+                {
+                  code: editorRef.current.getValue(),
+                },
+                { headers: { token: user.token } }
+              );
+
+              setRunResult(response.data);
+            } finally {
+              setLoading(false);
+            }
+          } else {
+            console.error("User not signed in");
           }
         }}
       >

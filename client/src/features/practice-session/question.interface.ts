@@ -1,4 +1,6 @@
 export interface Question {
-  title: string;
+  answer: string;
+  notes: { note: string }[];
   questionHtml: string;
+  title: string;
 }

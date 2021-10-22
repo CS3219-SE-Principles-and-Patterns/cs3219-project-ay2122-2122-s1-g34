@@ -1,4 +1,4 @@
-import { Container, LinearProgress } from "@mui/material";
+import { LinearProgress } from "@mui/material";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
@@ -68,24 +68,15 @@ export default function Session() {
     <>
       <SessionModal />
       <SessionHeader />
-      <Container
-        fixed
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
+      <SessionContainer
+        question={question}
+        CollaborativeEditorProps={{
+          hasSubmitButton: true,
+          isSubmitButtonDisabled: isUserOffline,
+          onSubmitButtonClick: () =>
+            dispatch(setHasClickedOnSubmitSession(true)),
         }}
-      >
-        <SessionContainer
-          question={question}
-          CollaborativeEditorProps={{
-            hasSubmitButton: true,
-            isSubmitButtonDisabled: isUserOffline,
-            onSubmitButtonClick: () =>
-              dispatch(setHasClickedOnSubmitSession(true)),
-          }}
-        />
-      </Container>
+      />
       <DisconnectedSnackbar />
     </>
   );

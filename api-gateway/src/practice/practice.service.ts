@@ -135,7 +135,13 @@ export class PracticeService {
       id: string;
       allowedUserIds: string[];
       difficulty: string;
-      question: { title: string; questionHtml: string; answer: string };
+      code: string;
+      question: {
+        title: string;
+        questionHtml: string;
+        answer: string;
+        notes: { note: string }[];
+      };
     }>(this.natsClient.send("findOneClosedSession", { userId: user.uid, id }));
 
     // get peer display name

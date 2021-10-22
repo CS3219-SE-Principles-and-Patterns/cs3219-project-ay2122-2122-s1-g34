@@ -1,8 +1,9 @@
+import { Question } from "features/practice-session/question.interface";
+
 export interface PastAttempt {
   id: string;
-  code?: string;
+  code: string;
   difficulty: string;
-  notes?: string;
   peerDisplayName: string;
-  question: { title: string };
+  question: Question;
 }

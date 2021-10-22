@@ -23,7 +23,6 @@ export default function PastAttempts() {
   return (
     <>
       <SignedInHeader />
-
       <Container maxWidth="lg" disableGutters sx={{ paddingY: 1 }}>
         <Box
           sx={{
