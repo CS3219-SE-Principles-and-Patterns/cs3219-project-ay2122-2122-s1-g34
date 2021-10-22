@@ -1,10 +1,19 @@
-import { Controller, Post, Body, UseGuards, Get, Param } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Param,
+  Put,
+} from "@nestjs/common";
 import { EventPattern } from "@nestjs/microservices";
 import { ApiHeader } from "@nestjs/swagger";
 import { AuthGuard } from "src/common/guards/auth.guard";
 
 import { User } from "../common/decorators/user.decorator";
 import { JoinSessionDto } from "./dto/join-session.dto";
+import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
 import { PracticeGateway } from "./practice.gateway";
 import { PracticeService } from "./practice.service";
 
@@ -32,6 +41,20 @@ export class PracticeController {
   @UseGuards(AuthGuard)
   findOne(@User() user, @Param("id") id: string) {
     return this.practiceService.findOne(user, id);
+  }
+
+  @Put(":sessionId")
+  @UseGuards(AuthGuard)
+  updateSessionNote(
+    @User() user,
+    @Param("sessionId") sessionId: string,
+    @Body() updateSessionNoteDto: UpdateSessionNoteDto
+  ) {
+    return this.practiceService.updateSessionNote(
+      user,
+      sessionId,
+      updateSessionNoteDto
+    );
   }
 
   @EventPattern("session:started")

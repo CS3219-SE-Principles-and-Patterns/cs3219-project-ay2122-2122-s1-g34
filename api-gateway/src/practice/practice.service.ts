@@ -8,6 +8,7 @@ import { CollaborationService } from "src/collaboration/collaboration.service";
 
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
+import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
 
 @Injectable()
 export class PracticeService {
@@ -153,5 +154,19 @@ export class PracticeService {
     delete practice.allowedUserIds;
 
     return { ...practice, peerDisplayName: peer.displayName };
+  }
+
+  updateSessionNote(
+    user: admin.auth.DecodedIdToken,
+    sessionId: string,
+    updateSessionNoteDto: UpdateSessionNoteDto
+  ) {
+    return firstValueFrom(
+      this.natsClient.send("updateSessionNote", {
+        ...updateSessionNoteDto,
+        sessionId,
+        userId: user.uid,
+      })
+    );
   }
 }

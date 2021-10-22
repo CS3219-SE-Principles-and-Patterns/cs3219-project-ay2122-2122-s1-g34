@@ -5,6 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 
 import ormconfig from "./ormconfig";
 import { QuestionsModule } from "./questions/questions.module";
+import { SessionNotesModule } from "./session-notes/session-notes.module";
 import { SessionsModule } from "./sessions/sessions.module";
 
 @Module({
@@ -13,6 +14,7 @@ import { SessionsModule } from "./sessions/sessions.module";
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(ormconfig),
     QuestionsModule,
+    SessionNotesModule,
     SessionsModule,
   ],
 })
