@@ -6,7 +6,7 @@ import * as admin from "firebase-admin";
 export class FirebaseService {
   constructor() {
     // TODO: setup firebase admin SDK for prod
-    admin.initializeApp({ projectId: "peerprep-bde04" });
+    admin.initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID });
   }
 
   /**
