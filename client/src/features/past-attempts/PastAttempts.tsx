@@ -5,9 +5,9 @@ import {
   Typography,
   LinearProgress,
 } from "@mui/material";
-import useSWR from "swr";
 
 import { useAppSelector } from "common/hooks/use-redux.hook";
+import { useSWR } from "common/hooks/use-swr.hook";
 
 import SignedInHeader from "features/auth/SignedInHeader";
 import { selectUser } from "features/auth/user.slice";

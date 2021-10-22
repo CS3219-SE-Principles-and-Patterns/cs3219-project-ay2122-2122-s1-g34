@@ -47,17 +47,23 @@ export default function SessionNotes({
   sx,
   ...rest
 }: SessionNotesProps) {
+  const noteContent = notes?.[0]?.note ?? "";
+  const [note, setNote] = React.useState(noteContent);
+
   const [isSaving, setIsSaving] = React.useState(false);
-  const [note, setNote] = React.useState(notes?.[0]?.note ?? "");
   const user = useAppSelector(selectUser);
   const { attemptId } = useParams<{ attemptId: string }>();
+
+  React.useEffect(() => {
+    setNote(noteContent);
+  }, [noteContent]);
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNote(e.target.value);
     setIsSaving(true);
 
     if (user) {
-      updateNote(note, attemptId, user.token, () => {
+      updateNote(e.target.value, attemptId, user.token, () => {
         setIsSaving(false);
       });
     }
