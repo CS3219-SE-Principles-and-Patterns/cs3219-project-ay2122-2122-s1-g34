@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards, Get, Param } from "@nestjs/common";
 import { EventPattern } from "@nestjs/microservices";
 import { ApiHeader } from "@nestjs/swagger";
 import { AuthGuard } from "src/common/guards/auth.guard";
@@ -26,6 +26,12 @@ export class PracticeController {
   @UseGuards(AuthGuard)
   findAll(@User() user) {
     return this.practiceService.findAll(user);
+  }
+
+  @Get(":id")
+  @UseGuards(AuthGuard)
+  findOne(@User() user, @Param("id") id: string) {
+    return this.practiceService.findOne(user, id);
   }
 
   @EventPattern("session:started")

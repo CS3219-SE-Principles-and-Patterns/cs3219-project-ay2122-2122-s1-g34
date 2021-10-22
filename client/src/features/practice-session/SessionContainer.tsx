@@ -10,12 +10,12 @@ import { Question } from "features/practice-session/question.interface";
 
 interface SessionContainerProps {
   question: Question;
-  collaborativeEditorProps: Omit<CollaborativeEditorProps, "sx">;
+  CollaborativeEditorProps: Omit<CollaborativeEditorProps, "sx">;
 }
 
 export default function SessionContainer({
   question,
-  collaborativeEditorProps,
+  CollaborativeEditorProps,
 }: SessionContainerProps) {
   return (
     <Container
@@ -42,7 +42,7 @@ export default function SessionContainer({
       >
         <CollaborativeEditor
           sx={{ flexBasis: "60%", marginRight: 2 }}
-          {...collaborativeEditorProps}
+          {...CollaborativeEditorProps}
         />
         <ChatBox sx={{ flex: 1 }} />
       </Box>

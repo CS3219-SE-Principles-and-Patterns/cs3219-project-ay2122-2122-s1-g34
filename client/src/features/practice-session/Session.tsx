@@ -1,15 +1,12 @@
-import { Box, Container, LinearProgress } from "@mui/material";
+import { Container, LinearProgress } from "@mui/material";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-import QuestionDisplay from "common/components/QuestionDisplay";
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
 import { useSocket, useOnSocketConnect } from "common/hooks/use-socket.hook";
 
 import { selectUser } from "features/auth/user.slice";
-import CollaborativeEditor from "features/collaboration/CollaborativeEditor";
 import { setIsMatching } from "features/matching/matching.slice";
-import ChatBox from "features/practice-session/ChatBox";
 import DisconnectedSnackbar from "features/practice-session/DisconnectedSnackbar";
 import SessionHeader from "features/practice-session/SessionHeader";
 import SessionModal from "features/practice-session/SessionModal";
@@ -20,6 +17,8 @@ import {
   setHasEnded,
   setRoomId,
 } from "features/practice-session/practice-session.slice";
+
+import SessionContainer from "./SessionContainer";
 
 export default function Session() {
   const dispatch = useAppDispatch();
@@ -77,30 +76,15 @@ export default function Session() {
           flexGrow: 1,
         }}
       >
-        <QuestionDisplay
-          sx={{
-            minHeight: "200px",
-            marginBottom: 2,
-          }}
+        <SessionContainer
           question={question}
-        />
-        <Box
-          sx={{
-            display: "flex",
-            flex: 1,
-            minHeight: "620px",
+          CollaborativeEditorProps={{
+            hasSubmitButton: true,
+            isSubmitButtonDisabled: isUserOffline,
+            onSubmitButtonClick: () =>
+              dispatch(setHasClickedOnSubmitSession(true)),
           }}
-        >
-          <CollaborativeEditor
-            sx={{ flexBasis: "60%", marginRight: 2 }}
-            hasSubmitButton
-            isSubmitButtonDisabled={isUserOffline}
-            onSubmitButtonClick={() =>
-              dispatch(setHasClickedOnSubmitSession(true))
-            }
-          />
-          <ChatBox sx={{ flex: 1 }} />
-        </Box>
+        />
       </Container>
       <DisconnectedSnackbar />
     </>

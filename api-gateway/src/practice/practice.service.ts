@@ -129,4 +129,23 @@ export class PracticeService {
 
     return resolved;
   }
+
+  async findOne(user: admin.auth.DecodedIdToken, id: string) {
+    const practice = await firstValueFrom<{
+      id: string;
+      allowedUserIds: string[];
+      difficulty: string;
+      question: { title: string; questionHtml: string; answer: string };
+    }>(this.natsClient.send("findOneClosedSession", { userId: user.uid, id }));
+
+    // get peer display name
+    const peerId = practice.allowedUserIds.find(
+      (userId) => userId !== user.uid
+    );
+    const peer = await this.firebaseService.getUserInformation(peerId);
+
+    delete practice.allowedUserIds;
+
+    return { ...practice, peerDisplayName: peer.displayName };
+  }
 }
