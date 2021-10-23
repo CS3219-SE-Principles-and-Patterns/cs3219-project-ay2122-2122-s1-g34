@@ -80,7 +80,12 @@ export default function MatchingModal() {
           <>
             <CountdownTimer
               timeAllowed={15}
-              callbackOnTimeout={() => dispatch(setHasTimeout(true))}
+              callbackOnTimeout={() => {
+                if (socket) {
+                  socket.disconnect();
+                }
+                dispatch(setHasTimeout(true));
+              }}
               hasTimeout={hasTimeout}
             />
 

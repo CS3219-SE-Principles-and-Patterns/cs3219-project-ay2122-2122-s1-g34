@@ -12,8 +12,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const onDisconnect = React.useCallback(
     (reason: string) => {
       if (
-        reason !== "io server disconnect" &&
-        reason !== "io client disconnect"
+        reason === "io server disconnect" ||
+        reason === "io client disconnect"
       ) {
         // only delete socket if socket was intentionally closed
         setSocket(undefined);

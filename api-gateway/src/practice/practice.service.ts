@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { WsException } from "@nestjs/websockets";
 import * as admin from "firebase-admin";
@@ -26,18 +26,21 @@ export class PracticeService {
   ) {
     const room = client.data.sessionId;
     const socketsInRoom = await server.in(room).fetchSockets();
-    if (
+    const isDisconnectIntentional =
       reason !== "ping timeout" &&
       reason !== "transport close" &&
-      reason !== "transport error"
-    ) {
+      reason !== "transport error";
+
+    // disconnect practice session
+    this.natsClient.emit("handleSessionDisconnecting", {
+      sessionId: room,
+      isDisconnectIntentional,
+    });
+    if (isDisconnectIntentional) {
       // end the session if the socket was intentionally disconnected by a user
 
       // disconnect collaboration
       this.collaborationService.handleDisconnecting(client);
-
-      // disconnect practice session
-      this.natsClient.emit("handleSessionDisconnecting", room);
 
       socketsInRoom.forEach((socket) => {
         if (socket.data.userId !== client.data.userId) {
@@ -111,12 +114,18 @@ export class PracticeService {
     user: admin.auth.DecodedIdToken,
     joinSessionDto: JoinSessionDto
   ) {
-    return this.natsClient
-      .send("joinSession", {
-        userId: user.uid,
-        ...joinSessionDto,
-      })
-      .pipe(map((session) => ({ sessionId: session.id })));
+    try {
+      const result = await this.natsClient
+        .send("joinSession", {
+          userId: user.uid,
+          ...joinSessionDto,
+        })
+        .pipe(map((session) => ({ sessionId: session.id })));
+
+      return result;
+    } catch (e) {
+      throw new HttpException(e, e.statusCode);
+    }
   }
 
   async handleSessionStarted(sessionId: string, server: Server) {
@@ -151,26 +160,40 @@ export class PracticeService {
   }
 
   async findAll(user: admin.auth.DecodedIdToken) {
-    const practices = await firstValueFrom<Session[]>(
+    const sessions = await firstValueFrom<Session[]>(
       this.natsClient.send("findAllClosedSessions", user.uid)
     );
 
     // get peer display name
-    const practicesWithDisplayName = practices.map(async (practice) =>
+    const sessionsWithDisplayName = sessions.map(async (practice) =>
       this.withPeerDisplayName(practice, user.uid)
     );
 
-    const resolved = await Promise.all(practicesWithDisplayName);
+    const resolved = await Promise.all(sessionsWithDisplayName);
 
     return resolved;
   }
 
   async findOne(user: admin.auth.DecodedIdToken, id: string) {
-    const practice = await firstValueFrom<Session>(
+    const session = await firstValueFrom<Session>(
       this.natsClient.send("findOneClosedSession", { userId: user.uid, id })
     );
 
-    return this.withPeerDisplayName(practice, user.uid);
+    return this.withPeerDisplayName(session, user.uid);
+  }
+
+  async findOneInProgressSessionByUser(user: admin.auth.DecodedIdToken) {
+    try {
+      const session = await firstValueFrom<Session>(
+        this.natsClient.send("findOneInProgressSessionByUser", user.uid)
+      );
+      return session;
+    } catch {
+      throw new HttpException(
+        { statusCode: 404, message: "No sessions found", error: "Not Found" },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
 
   updateSessionNote(

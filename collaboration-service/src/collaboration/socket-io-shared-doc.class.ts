@@ -137,15 +137,13 @@ export const closeConn = (
       Array.from(controlledIds),
       null
     );
-    if (doc.conns.size === 0) {
-      // save doc contents before removing doc from memory
-      const xmlFragment = doc.getXmlFragment(doc.name);
-      const content = JSON.stringify(xmlFragment.toJSON());
+    // save doc contents before removing doc from memory
+    const xmlFragment = doc.getXmlFragment(doc.name);
+    const content = JSON.stringify(xmlFragment.toJSON());
 
-      saveDocument(content).then(() => {
-        docs.delete(doc.name);
-      });
-    }
+    saveDocument(content).then(() => {
+      docs.delete(doc.name);
+    });
   }
 };
 

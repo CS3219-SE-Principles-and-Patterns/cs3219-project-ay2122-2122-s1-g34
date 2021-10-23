@@ -8,6 +8,7 @@ import { QuestionsService } from "src/questions/questions.service";
 import { Repository } from "typeorm";
 
 import { FindOneSessionDto } from "./dto/find-one-session.dto";
+import { HandleSessionDisconnectingDto } from "./dto/handle-session-disconnecting.dto";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { Session, Status } from "./entities/session.entity";
@@ -114,6 +115,18 @@ export class SessionsService {
       .getOne();
   }
 
+  findOneInProgressSessionByUser(userId: string) {
+    return this.sessionsRepository
+      .createQueryBuilder("session")
+      .select(["session.id", "question.title"])
+      .where("session.allowedUserIds @> (:userId)", {
+        userId: [userId],
+      })
+      .leftJoin("session.question", "question")
+      .andWhere("session.status = :status", { status: Status.InProgress })
+      .getOne();
+  }
+
   async findOneInProgressSession(id: string) {
     const result = await this.sessionsRepository
       .createQueryBuilder("session")
@@ -163,7 +176,12 @@ export class SessionsService {
     return this.sessionsRepository.save(updatedSession);
   }
 
-  async handleSessionDisconnecting(sessionId: string) {
+  async handleSessionDisconnecting(
+    handleSessionDisconnectingDto: HandleSessionDisconnectingDto
+  ) {
+    const { isDisconnectIntentional, sessionId } =
+      handleSessionDisconnectingDto;
+
     const session = await this.sessionsRepository
       .createQueryBuilder("session")
       .where("session.id = :sessionId", {
@@ -175,10 +193,13 @@ export class SessionsService {
     }
 
     if (session.status === Status.Open) {
-      // delete session if user disconnects even before anyone has joined the room
+      // delete session if user disconnects (purposefully or not) even before anyone has joined the room
       await this.sessionsRepository.remove(session);
-    } else if (session.status === Status.InProgress) {
-      // close session if a single user disconnects while session is in progress
+    } else if (
+      session.status === Status.InProgress &&
+      isDisconnectIntentional
+    ) {
+      // close session if a single user purposefully disconnects while session is in progress
       session.status = Status.Closed;
       await this.sessionsRepository.save(session);
     }

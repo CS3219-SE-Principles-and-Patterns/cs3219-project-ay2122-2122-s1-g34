@@ -2,6 +2,7 @@ import { Controller } from "@nestjs/common";
 import { EventPattern, MessagePattern, Payload } from "@nestjs/microservices";
 
 import { FindOneSessionDto } from "./dto/find-one-session.dto";
+import { HandleSessionDisconnectingDto } from "./dto/handle-session-disconnecting.dto";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { SessionsService } from "./sessions.service";
@@ -30,6 +31,11 @@ export class SessionsController {
     return this.sessionsService.findOneUnclosedSession(userId);
   }
 
+  @MessagePattern("findOneInProgressSessionByUser")
+  findOneInProgressSessionByUser(@Payload() userId: string) {
+    return this.sessionsService.findOneInProgressSessionByUser(userId);
+  }
+
   @MessagePattern("findOneInProgressSession")
   findOneInProgressSession(@Payload() id: string) {
     return this.sessionsService.findOneInProgressSession(id);
@@ -46,7 +52,11 @@ export class SessionsController {
    * @param isAnotherUserInSession is there another user remaining in the session
    */
   @EventPattern("handleSessionDisconnecting")
-  handleSessionDisconnecting(@Payload() sessionId: string) {
-    return this.sessionsService.handleSessionDisconnecting(sessionId);
+  handleSessionDisconnecting(
+    @Payload() handleSessionDisconnectingDto: HandleSessionDisconnectingDto
+  ) {
+    return this.sessionsService.handleSessionDisconnecting(
+      handleSessionDisconnectingDto
+    );
   }
 }
