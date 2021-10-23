@@ -30,24 +30,26 @@ export default function RunCodeButton({
   ...rest
 }: RunCodeButtonProps) {
   const [loading, setLoading] = React.useState(false);
-  const [runResult, setRunResult] = React.useState("");
+  const [runResult, setRunResult] = React.useState<string | undefined>(
+    undefined
+  );
   const user = useAppSelector(selectUser);
 
   const closeRunResult = () => {
-    setRunResult("");
+    setRunResult(undefined);
   };
 
   // display the value in ref in the dialog.
   // this ensures that when the dialog is transitioning
   // to a closed state, the output is still visible
-  const runResultRef = React.useRef("");
+  const runResultRef = React.useRef<string>();
   React.useEffect(() => {
     runResultRef.current = runResult;
   }, [runResult]);
 
   return (
     <>
-      <Dialog open={runResult.length > 0} fullWidth>
+      <Dialog open={runResult !== undefined} fullWidth>
         <DialogTitle>Output</DialogTitle>
         <DialogContent>
           <Box
@@ -60,9 +62,10 @@ export default function RunCodeButton({
               borderWidth: 1,
               borderStyle: "solid",
               borderColor: "black",
+              wordBreak: "break-all",
             }}
           >
-            {runResult.length > 0 ? runResult : runResultRef.current}
+            {runResult !== undefined ? runResult : runResultRef.current}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -84,7 +87,7 @@ export default function RunCodeButton({
                 { headers: { token: user.token } }
               );
 
-              setRunResult(response.data);
+              setRunResult(JSON.stringify(response.data));
             } finally {
               setLoading(false);
             }
