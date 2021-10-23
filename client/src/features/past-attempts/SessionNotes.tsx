@@ -82,8 +82,15 @@ export default function SessionNotes({
       }}
     >
       <Stack sx={{ height: "100%" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h6" sx={{ marginBottom: 3, fontWeight: "bold" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 3,
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Notes
           </Typography>
           {isSaving ? (

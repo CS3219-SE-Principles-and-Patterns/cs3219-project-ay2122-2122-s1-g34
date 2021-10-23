@@ -1,23 +1,21 @@
 import { Button, Typography, Grid } from "@mui/material";
 
 import Header from "common/components/Header";
-import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
+import { useAppSelector } from "common/hooks/use-redux.hook";
 
 import { selectUser } from "features/auth/user.slice";
-import { setHasClickedOnLeaveSession } from "features/practice-session/practice-session.slice";
 
 interface SessionHeaderContainerProps {
   headerText: string;
+  onLeaveSessionClick?: () => void;
   peerDisplayName: string;
-  hasEndSession?: boolean;
 }
 
 export default function SessionHeaderContainer({
   headerText,
+  onLeaveSessionClick,
   peerDisplayName,
-  hasEndSession,
 }: SessionHeaderContainerProps) {
-  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
 
   if (!user) {
@@ -79,7 +77,7 @@ export default function SessionHeaderContainer({
           </Grid>
         </Grid>
       </Grid>
-      {hasEndSession && (
+      {!!onLeaveSessionClick && (
         <Button
           variant="contained"
           size="small"
@@ -99,8 +97,4 @@ export default function SessionHeaderContainer({
       )}
     </Header>
   );
-
-  function onLeaveSessionClick() {
-    dispatch(setHasClickedOnLeaveSession(true));
-  }
 }

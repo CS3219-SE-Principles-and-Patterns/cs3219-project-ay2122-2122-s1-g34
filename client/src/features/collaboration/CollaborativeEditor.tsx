@@ -1,5 +1,5 @@
 import Editor, { OnMount } from "@monaco-editor/react";
-import { Box, BoxProps, Typography, Button } from "@mui/material";
+import { Box, BoxProps, Typography } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import React from "react";
 import { MonacoBinding } from "y-monaco";
