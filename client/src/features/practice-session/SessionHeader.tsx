@@ -1,17 +1,23 @@
+import React from "react";
+
 import SessionHeaderContainer from "common/components/SessionHeaderContainer";
-import { useAppSelector } from "common/hooks/use-redux.hook";
 
-import { selectPracticeSession } from "features/practice-session/practice-session.slice";
+interface SessionHeaderProps {
+  peerDisplayName: string;
+  setIsLeaving: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export default function SessionHeader() {
-  const practiceSession = useAppSelector(selectPracticeSession);
-
-  const { peerTwo } = practiceSession;
+export default function SessionHeader({
+  peerDisplayName,
+  setIsLeaving,
+}: SessionHeaderProps) {
   return (
     <SessionHeaderContainer
       headerText="Peers in Session"
-      peerDisplayName={peerTwo?.displayName as string}
-      hasEndSession
+      peerDisplayName={peerDisplayName}
+      onLeaveSessionClick={() => {
+        setIsLeaving(true);
+      }}
     />
   );
 }

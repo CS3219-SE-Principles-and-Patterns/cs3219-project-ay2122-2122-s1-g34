@@ -9,6 +9,7 @@ import { CollaborationService } from "src/collaboration/collaboration.service";
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
+import { Session } from "./interfaces/session.interface";
 
 @Injectable()
 export class PracticeService {
@@ -18,18 +19,50 @@ export class PracticeService {
     @Inject("PRACTICE_SERVICE") private natsClient: ClientProxy
   ) {}
 
-  private async handleSocketDisconnecting(client: Socket, server: Server) {
+  private async handleSocketDisconnecting(
+    reason: string,
+    client: Socket,
+    server: Server
+  ) {
     const room = client.data.sessionId;
     const socketsInRoom = await server.in(room).fetchSockets();
+    if (
+      reason !== "ping timeout" &&
+      reason !== "transport close" &&
+      reason !== "transport error"
+    ) {
+      // end the session if the socket was intentionally disconnected by a user
 
-    // disconnect collaboration
-    this.collaborationService.handleDisconnecting(client);
+      // disconnect collaboration
+      this.collaborationService.handleDisconnecting(client);
 
-    // disconnect practice session
-    this.natsClient.emit("handleSessionDisconnecting", {
-      sessionId: room,
-      isAnotherUserInSession: socketsInRoom.length >= 2,
-    });
+      // disconnect practice session
+      this.natsClient.emit("handleSessionDisconnecting", room);
+
+      socketsInRoom.forEach((socket) => {
+        if (socket.data.userId !== client.data.userId) {
+          socket.emit("practice:ended");
+        }
+      });
+    } else {
+      // socket was disconnected from network issues and other non purposeful reasons
+      socketsInRoom.forEach((socket) => {
+        if (socket.data.userId !== client.data.userId) {
+          socket.emit("practice:peer-lost-connection");
+        }
+      });
+    }
+  }
+
+  private async withPeerDisplayName(session: Session, callerUserId: string) {
+    const peerId = session.allowedUserIds.find(
+      (userId) => userId !== callerUserId
+    );
+    const peer = await this.firebaseService.getUserInformation(peerId);
+
+    delete session.allowedUserIds;
+
+    return { ...session, peerDisplayName: peer.displayName };
   }
 
   async handleSocketConnection(client: Socket, server: Server) {
@@ -46,9 +79,6 @@ export class PracticeService {
       const session = await firstValueFrom(
         this.natsClient.send("findOneUnclosedSession", user.uid)
       );
-      if (!session) {
-        throw new Error("User has not joined any room yet.");
-      }
 
       // join session room to receive room updates
       await client.join(session.id);
@@ -68,16 +98,19 @@ export class PracticeService {
           }
         });
 
-      client.on("disconnecting", () => {
-        this.handleSocketDisconnecting(client, server);
+      client.on("disconnecting", (reason) => {
+        this.handleSocketDisconnecting(reason, client, server);
       });
     } catch (e) {
+      client.emit("practice:error");
       client.disconnect();
-      throw new WsException(e?.message ?? "An unspecified error has occurred.");
     }
   }
 
-  joinSession(user: admin.auth.DecodedIdToken, joinSessionDto: JoinSessionDto) {
+  async joinSession(
+    user: admin.auth.DecodedIdToken,
+    joinSessionDto: JoinSessionDto
+  ) {
     return this.natsClient
       .send("joinSession", {
         userId: user.uid,
@@ -97,34 +130,35 @@ export class PracticeService {
     });
   }
 
-  async practiceInit(client: Socket) {
+  async practiceInit(client: Socket, server: Server) {
     this.collaborationService.handleConnection(client);
-    return firstValueFrom(
+    const session = await firstValueFrom(
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
     );
+    if (!session) {
+      throw new WsException("User has not joined any room yet.");
+    }
+
+    const room = client.data.sessionId;
+    const socketsInRoom = await server.in(room).fetchSockets();
+    socketsInRoom.forEach((socket) => {
+      if (socket.data.userId !== client.data.userId) {
+        socket.emit("practice:peer-joined");
+      }
+    });
+
+    return this.withPeerDisplayName(session, client.data.userId);
   }
 
   async findAll(user: admin.auth.DecodedIdToken) {
-    const practices = await firstValueFrom<
-      {
-        id: string;
-        allowedUserIds: string[];
-        difficulty: string;
-        question: { title: string };
-      }[]
-    >(this.natsClient.send("findAllClosedSessions", user.uid));
+    const practices = await firstValueFrom<Session[]>(
+      this.natsClient.send("findAllClosedSessions", user.uid)
+    );
 
     // get peer display name
-    const practicesWithDisplayName = practices.map(async (practice) => {
-      const peerId = practice.allowedUserIds.find(
-        (userId) => userId !== user.uid
-      );
-      const peer = await this.firebaseService.getUserInformation(peerId);
-
-      delete practice.allowedUserIds;
-
-      return { ...practice, peerDisplayName: peer.displayName };
-    });
+    const practicesWithDisplayName = practices.map(async (practice) =>
+      this.withPeerDisplayName(practice, user.uid)
+    );
 
     const resolved = await Promise.all(practicesWithDisplayName);
 
@@ -132,28 +166,11 @@ export class PracticeService {
   }
 
   async findOne(user: admin.auth.DecodedIdToken, id: string) {
-    const practice = await firstValueFrom<{
-      id: string;
-      allowedUserIds: string[];
-      difficulty: string;
-      code: string;
-      question: {
-        title: string;
-        questionHtml: string;
-        answer: string;
-        notes: { note: string }[];
-      };
-    }>(this.natsClient.send("findOneClosedSession", { userId: user.uid, id }));
-
-    // get peer display name
-    const peerId = practice.allowedUserIds.find(
-      (userId) => userId !== user.uid
+    const practice = await firstValueFrom<Session>(
+      this.natsClient.send("findOneClosedSession", { userId: user.uid, id })
     );
-    const peer = await this.firebaseService.getUserInformation(peerId);
 
-    delete practice.allowedUserIds;
-
-    return { ...practice, peerDisplayName: peer.displayName };
+    return this.withPeerDisplayName(practice, user.uid);
   }
 
   updateSessionNote(

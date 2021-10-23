@@ -117,7 +117,12 @@ export class SessionsService {
   async findOneInProgressSession(id: string) {
     const result = await this.sessionsRepository
       .createQueryBuilder("session")
-      .select(["session.id", "question.title", "question.questionHtml"])
+      .select([
+        "session.id",
+        "session.allowedUserIds",
+        "question.title",
+        "question.questionHtml",
+      ])
       .leftJoin("session.question", "question")
       .where("session.id = :id", { id })
       .andWhere("session.status = :status", { status: Status.InProgress })
@@ -158,17 +163,13 @@ export class SessionsService {
     return this.sessionsRepository.save(updatedSession);
   }
 
-  async handleSessionDisconnecting(
-    sessionId: string,
-    isAnotherUserInSession: boolean
-  ) {
+  async handleSessionDisconnecting(sessionId: string) {
     const session = await this.sessionsRepository
       .createQueryBuilder("session")
       .where("session.id = :sessionId", {
         sessionId,
       })
       .getOne();
-
     if (!session) {
       return;
     }
@@ -176,12 +177,8 @@ export class SessionsService {
     if (session.status === Status.Open) {
       // delete session if user disconnects even before anyone has joined the room
       await this.sessionsRepository.remove(session);
-    } else if (
-      session.status === Status.InProgress &&
-      !isAnotherUserInSession
-    ) {
-      // close session if both users disconnected
-      // TODO: maybe don't close immediately (?)
+    } else if (session.status === Status.InProgress) {
+      // close session if a single user disconnects while session is in progress
       session.status = Status.Closed;
       await this.sessionsRepository.save(session);
     }

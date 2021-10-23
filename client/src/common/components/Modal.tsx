@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 
 interface ModalProps {
   isOpen: boolean;
-  handleClose: () => void;
+  handleClose?: () => void;
   outlineColor: string;
   children: ReactNode;
 }

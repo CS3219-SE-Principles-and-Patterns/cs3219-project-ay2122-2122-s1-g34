@@ -46,19 +46,7 @@ export class SessionsController {
    * @param isAnotherUserInSession is there another user remaining in the session
    */
   @EventPattern("handleSessionDisconnecting")
-  handleSessionDisconnecting(
-    @Payload()
-    {
-      sessionId,
-      isAnotherUserInSession,
-    }: {
-      sessionId: string;
-      isAnotherUserInSession: boolean;
-    }
-  ) {
-    return this.sessionsService.handleSessionDisconnecting(
-      sessionId,
-      isAnotherUserInSession
-    );
+  handleSessionDisconnecting(@Payload() sessionId: string) {
+    return this.sessionsService.handleSessionDisconnecting(sessionId);
   }
 }

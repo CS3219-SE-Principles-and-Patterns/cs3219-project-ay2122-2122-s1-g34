@@ -1,5 +1,6 @@
 import { LinearProgress } from "@mui/material";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { io } from "socket.io-client";
 
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
@@ -8,76 +9,95 @@ import { useSocket, useOnSocketConnect } from "common/hooks/use-socket.hook";
 import { selectUser } from "features/auth/user.slice";
 import { setIsMatching } from "features/matching/matching.slice";
 import DisconnectedSnackbar from "features/practice-session/DisconnectedSnackbar";
+import LeaveSessionModal from "features/practice-session/LeaveSessionModal";
+import SessionContainer from "features/practice-session/SessionContainer";
 import SessionHeader from "features/practice-session/SessionHeader";
-import SessionModal from "features/practice-session/SessionModal";
-import {
-  selectPracticeSession,
-  setQuestion,
-  setHasClickedOnSubmitSession,
-  setHasEnded,
-  setRoomId,
-} from "features/practice-session/practice-session.slice";
-
-import SessionContainer from "./SessionContainer";
+import { PracticeSession } from "features/practice-session/practice-session.interface";
+import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 export default function Session() {
+  const history = useHistory();
+  const { open } = useSnackbar();
+  const [isLeaving, setIsLeaving] = React.useState(false);
+  const [hasSessionEnded, setHasSessionEnded] = React.useState(false);
+  const [practiceSession, setPracticeSession] =
+    React.useState<PracticeSession>();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
-  const practiceSession = useAppSelector(selectPracticeSession);
-  const { setSocket } = useSocket();
-
-  const { question, isPeerOffline, isUserOffline } = practiceSession;
+  const { socket, setSocket } = useSocket();
 
   useEffect(() => {
-    if (user) {
+    if (user && !socket) {
+      // connect to socket if no existing connection exists
       const newSocket = io({
         extraHeaders: { token: user.token },
       });
 
+      const onError = () => {
+        open({
+          severity: "error",
+          message: "An unspecified error has occurred",
+        });
+        history.push("/");
+      };
+
+      newSocket.on("practice:error", onError);
+
       setSocket(newSocket);
+
+      return () => {
+        newSocket.off("practice:error", onError);
+      };
     }
-  }, [user, setSocket]);
+    // eslint-disable-next-line
+  }, []);
 
   useOnSocketConnect((client) => {
-    client.emit("practice:init", undefined, (response: any) => {
+    client.emit("practice:init", undefined, (response: PracticeSession) => {
       if (response) {
-        dispatch(setRoomId(response.id));
-        dispatch(setQuestion(response.question));
+        setPracticeSession(response);
       }
     });
   });
-
-  useEffect(() => {
-    // Bring user to session ended page if
-    // both users go offline
-    if (isPeerOffline && isUserOffline) {
-      dispatch(setHasEnded(true));
-    }
-  }, [dispatch, isPeerOffline, isUserOffline]);
 
   useEffect(() => {
     // close is matching modal when user arrives on this page
     dispatch(setIsMatching(false));
   }, [dispatch]);
 
-  if (!question) {
+  useEffect(() => {
+    if (socket) {
+      socket.on("practice:ended", () => {
+        setHasSessionEnded(true);
+        setIsLeaving(true);
+        socket.disconnect();
+      });
+    }
+  }, [socket]);
+
+  if (!practiceSession) {
     return <LinearProgress />;
   }
 
   return (
     <>
-      <SessionModal />
-      <SessionHeader />
+      <LeaveSessionModal
+        open={isLeaving}
+        setIsLeaving={setIsLeaving}
+        practiceSession={practiceSession}
+        hasSessionEnded={hasSessionEnded}
+      />
+      <SessionHeader
+        peerDisplayName={practiceSession.peerDisplayName}
+        setIsLeaving={setIsLeaving}
+      />
       <SessionContainer
-        question={question}
+        question={practiceSession.question}
         CollaborativeEditorProps={{
-          hasSubmitButton: true,
-          isSubmitButtonDisabled: isUserOffline,
-          onSubmitButtonClick: () =>
-            dispatch(setHasClickedOnSubmitSession(true)),
+          practiceSession,
         }}
       />
-      <DisconnectedSnackbar />
+      <DisconnectedSnackbar peerDisplayName={practiceSession.peerDisplayName} />
     </>
   );
 }

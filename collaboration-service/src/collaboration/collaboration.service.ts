@@ -52,11 +52,16 @@ export class CollaborationService {
   handleDisconnecting(payload: CollaborationPayload) {
     const { roomName, socketId } = payload;
     const doc = getYDoc(roomName, this.apiGatewayClient);
-    closeConn(doc, socketId, (code: string) =>
-      firstValueFrom(
-        this.practiceClient.send("updateSession", { id: roomName, code })
-      )
-    );
+    closeConn(doc, socketId, (code: string) => {
+      if (code && code.trim().length > 0) {
+        return firstValueFrom(
+          this.practiceClient.send("updateSession", {
+            id: roomName,
+            code,
+          })
+        );
+      }
+    });
   }
 
   handleCollaboration(payload: CollaborationPayload) {

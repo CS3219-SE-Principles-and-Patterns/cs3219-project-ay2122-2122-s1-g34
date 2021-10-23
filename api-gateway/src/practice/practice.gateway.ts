@@ -24,6 +24,6 @@ export class PracticeGateway implements OnGatewayConnection {
    */
   @SubscribeMessage("practice:init")
   practiceInit(client: Socket) {
-    return this.practiceService.practiceInit(client);
+    return this.practiceService.practiceInit(client, this.server);
   }
 }
