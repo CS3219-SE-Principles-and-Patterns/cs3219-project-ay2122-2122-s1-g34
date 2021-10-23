@@ -79,9 +79,6 @@ export class PracticeService {
       const session = await firstValueFrom(
         this.natsClient.send("findOneUnclosedSession", user.uid)
       );
-      if (!session) {
-        throw new Error("User has not joined any room yet.");
-      }
 
       // join session room to receive room updates
       await client.join(session.id);
@@ -105,8 +102,8 @@ export class PracticeService {
         this.handleSocketDisconnecting(reason, client, server);
       });
     } catch (e) {
+      client.emit("practice:error");
       client.disconnect();
-      throw new WsException(e?.message ?? "An unspecified error has occurred.");
     }
   }
 
@@ -138,6 +135,9 @@ export class PracticeService {
     const session = await firstValueFrom(
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
     );
+    if (!session) {
+      throw new WsException("User has not joined any room yet.");
+    }
 
     const room = client.data.sessionId;
     const socketsInRoom = await server.in(room).fetchSockets();

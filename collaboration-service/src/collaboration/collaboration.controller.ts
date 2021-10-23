@@ -14,8 +14,8 @@ export class CollaborationController {
   }
 
   @EventPattern("collaboration:disconnecting")
-  handleDisconnect(roomName: string) {
-    this.collaborationService.handleDisconnecting(roomName);
+  handleDisconnect(payload: CollaborationPayload) {
+    this.collaborationService.handleDisconnecting(payload);
   }
 
   @EventPattern("collaboration:message")

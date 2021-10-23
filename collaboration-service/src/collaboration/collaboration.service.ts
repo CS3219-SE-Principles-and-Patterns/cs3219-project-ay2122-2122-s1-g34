@@ -49,9 +49,10 @@ export class CollaborationService {
     }
   }
 
-  handleDisconnecting(roomName: string) {
+  handleDisconnecting(payload: CollaborationPayload) {
+    const { roomName, socketId } = payload;
     const doc = getYDoc(roomName, this.apiGatewayClient);
-    closeConn(doc, (code: string) =>
+    closeConn(doc, socketId, (code: string) =>
       firstValueFrom(
         this.practiceClient.send("updateSession", { id: roomName, code })
       )

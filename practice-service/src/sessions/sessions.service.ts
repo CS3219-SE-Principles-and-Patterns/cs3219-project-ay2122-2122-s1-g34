@@ -170,7 +170,6 @@ export class SessionsService {
         sessionId,
       })
       .getOne();
-    console.log("session: ", session);
     if (!session) {
       return;
     }

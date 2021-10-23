@@ -9,6 +9,29 @@ const Context = React.createContext<{
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = React.useState<Socket>();
 
+  const onDisconnect = React.useCallback(
+    (reason: string) => {
+      if (
+        reason !== "io server disconnect" &&
+        reason !== "io client disconnect"
+      ) {
+        // only delete socket if socket was intentionally closed
+        setSocket(undefined);
+      }
+    },
+    [setSocket]
+  );
+
+  React.useEffect(() => {
+    if (socket) {
+      socket.on("disconnect", onDisconnect);
+
+      return () => {
+        socket.off("disconnect", onDisconnect);
+      };
+    }
+  }, [socket, onDisconnect]);
+
   return (
     <Context.Provider value={{ socket, setSocket }}>
       {children}

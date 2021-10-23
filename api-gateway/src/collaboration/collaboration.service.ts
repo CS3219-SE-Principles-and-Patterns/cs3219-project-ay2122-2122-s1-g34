@@ -18,7 +18,10 @@ export class CollaborationService {
   }
 
   handleDisconnecting(client: Socket) {
-    this.natsClient.emit("collaboration:disconnecting", client.data.sessionId);
+    this.natsClient.emit("collaboration:disconnecting", {
+      roomName: client.data.sessionId,
+      socketId: client.id,
+    });
   }
 
   handleCollaboration(client: Socket, message: string) {

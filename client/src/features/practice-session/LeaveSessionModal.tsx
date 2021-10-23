@@ -13,16 +13,22 @@ interface LeaveSessionModalProps {
   open: boolean;
   practiceSession: PracticeSession;
   setIsLeaving: React.Dispatch<React.SetStateAction<boolean>>;
+  hasSessionEnded?: boolean;
 }
 
 export default function LeaveSessionModal({
   open,
   practiceSession,
   setIsLeaving,
+  hasSessionEnded,
 }: LeaveSessionModalProps) {
-  const [hasEnded, setHasEnded] = React.useState(false);
+  const [hasEnded, setHasEnded] = React.useState(hasSessionEnded);
   const user = useAppSelector(selectUser);
   const { socket } = useSocket();
+
+  React.useEffect(() => {
+    setHasEnded(hasSessionEnded);
+  }, [hasSessionEnded]);
 
   return (
     <Modal isOpen={open} outlineColor={"green"}>
