@@ -31,6 +31,11 @@ export class SessionsController {
     return this.sessionsService.findOneUnclosedSession(userId);
   }
 
+  @MessagePattern("findOneInProgressSessionByUser")
+  findOneInProgressSessionByUser(@Payload() userId: string) {
+    return this.sessionsService.findOneInProgressSessionByUser(userId);
+  }
+
   @MessagePattern("findOneInProgressSession")
   findOneInProgressSession(@Payload() id: string) {
     return this.sessionsService.findOneInProgressSession(id);

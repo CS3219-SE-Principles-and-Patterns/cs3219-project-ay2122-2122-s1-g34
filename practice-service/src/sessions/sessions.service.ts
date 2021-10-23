@@ -115,6 +115,18 @@ export class SessionsService {
       .getOne();
   }
 
+  findOneInProgressSessionByUser(userId: string) {
+    return this.sessionsRepository
+      .createQueryBuilder("session")
+      .select(["session.id", "question.title"])
+      .where("session.allowedUserIds @> (:userId)", {
+        userId: [userId],
+      })
+      .leftJoin("session.question", "question")
+      .andWhere("session.status = :status", { status: Status.InProgress })
+      .getOne();
+  }
+
   async findOneInProgressSession(id: string) {
     const result = await this.sessionsRepository
       .createQueryBuilder("session")

@@ -160,26 +160,40 @@ export class PracticeService {
   }
 
   async findAll(user: admin.auth.DecodedIdToken) {
-    const practices = await firstValueFrom<Session[]>(
+    const sessions = await firstValueFrom<Session[]>(
       this.natsClient.send("findAllClosedSessions", user.uid)
     );
 
     // get peer display name
-    const practicesWithDisplayName = practices.map(async (practice) =>
+    const sessionsWithDisplayName = sessions.map(async (practice) =>
       this.withPeerDisplayName(practice, user.uid)
     );
 
-    const resolved = await Promise.all(practicesWithDisplayName);
+    const resolved = await Promise.all(sessionsWithDisplayName);
 
     return resolved;
   }
 
   async findOne(user: admin.auth.DecodedIdToken, id: string) {
-    const practice = await firstValueFrom<Session>(
+    const session = await firstValueFrom<Session>(
       this.natsClient.send("findOneClosedSession", { userId: user.uid, id })
     );
 
-    return this.withPeerDisplayName(practice, user.uid);
+    return this.withPeerDisplayName(session, user.uid);
+  }
+
+  async findOneInProgressSessionByUser(user: admin.auth.DecodedIdToken) {
+    try {
+      const session = await firstValueFrom<Session>(
+        this.natsClient.send("findOneInProgressSessionByUser", user.uid)
+      );
+      return session;
+    } catch {
+      throw new HttpException(
+        { statusCode: 404, message: "No sessions found", error: "Not Found" },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
 
   updateSessionNote(

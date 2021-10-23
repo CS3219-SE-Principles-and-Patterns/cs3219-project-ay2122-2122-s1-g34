@@ -1,4 +1,11 @@
-import { Box, Container, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  LinearProgress,
+  Typography,
+} from "@mui/material";
+import axios from "axios";
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
@@ -18,15 +25,20 @@ import {
   setHasTimeout,
   DifficultyLevel,
 } from "features/matching/matching.slice";
+import { PracticeSession } from "features/practice-session/practice-session.interface";
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 export default function Dashboard() {
+  const [inProgressSession, setInProgressSession] = React.useState<
+    PracticeSession | false
+  >();
   const [isLoading, setIsLoading] = React.useState(false);
   const dispatch = useAppDispatch();
   const history = useHistory();
   const user = useAppSelector(selectUser);
   const { open } = useSnackbar();
   const { socket, setSocket } = useSocket();
+
   useOnSocketDisconnect(() => {
     dispatch(setIsMatching(false));
     setIsLoading(false);
@@ -48,6 +60,27 @@ export default function Dashboard() {
       };
     }
   }, [socket, history]);
+
+  React.useEffect(() => {
+    if (user) {
+      // check if user is already in a in progress session
+      axios
+        .get<PracticeSession>("/practice/in-progress", {
+          headers: { token: user.token },
+        })
+        .then((response) => {
+          setInProgressSession(response.data);
+        })
+        .catch(() => {
+          // no session in progress for the current user
+          setInProgressSession(false);
+        });
+    }
+  }, [user]);
+
+  if (inProgressSession === undefined) {
+    return <LinearProgress />;
+  }
 
   return (
     <>
@@ -96,6 +129,7 @@ export default function Dashboard() {
                   title={"Easy question"}
                   subtitle={"Going chill today"}
                   onCardClick={() => quickStartQuestion("easy")}
+                  disabled={!!inProgressSession}
                 />
               </Grid>
               <Grid item xs={4}>
@@ -104,6 +138,7 @@ export default function Dashboard() {
                   title={"Medium question"}
                   subtitle={"Looking for a challenge"}
                   onCardClick={() => quickStartQuestion("medium")}
+                  disabled={!!inProgressSession}
                 />
               </Grid>
 
@@ -113,6 +148,7 @@ export default function Dashboard() {
                   title={"Hard question"}
                   subtitle={"Bring it on!"}
                   onCardClick={() => quickStartQuestion("hard")}
+                  disabled={!!inProgressSession}
                 />
               </Grid>
             </Grid>
@@ -138,9 +174,13 @@ export default function Dashboard() {
                 <DashboardCard
                   outlineColor={"purple"}
                   title={"Continue a task"}
-                  subtitle={"No on-going task"}
+                  subtitle={
+                    inProgressSession
+                      ? inProgressSession.question.title
+                      : "No on-going task"
+                  }
                   onCardClick={continueOngoingTask}
-                  disabled
+                  disabled={!inProgressSession}
                 />
               </Grid>
               <Grid item xs={3}>
@@ -210,7 +250,6 @@ export default function Dashboard() {
   }
 
   function continueOngoingTask() {
-    // TODO: navigate to practice session
-    console.log("Continues on-going task");
+    history.push("/session");
   }
 }

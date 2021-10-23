@@ -37,6 +37,12 @@ export class PracticeController {
     return this.practiceService.findAll(user);
   }
 
+  @Get("in-progress")
+  @UseGuards(AuthGuard)
+  findOneInProgressSessionByUser(@User() user) {
+    return this.practiceService.findOneInProgressSessionByUser(user);
+  }
+
   @Get(":id")
   @UseGuards(AuthGuard)
   findOne(@User() user, @Param("id") id: string) {
