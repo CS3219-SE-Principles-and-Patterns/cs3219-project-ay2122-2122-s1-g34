@@ -126,27 +126,23 @@ export const messageListener = (
 
 export const closeConn = (
   doc: SocketIoSharedDoc,
-  socketId: string,
   saveDocument: (code: string) => Promise<void>
 ) => {
-  if (doc.conns.has(socketId)) {
-    const controlledIds = doc.conns.get(socketId);
-    doc.conns.delete(socketId);
+  for (const value of doc.conns.values()) {
     awarenessProtocol.removeAwarenessStates(
       doc.awareness,
-      Array.from(controlledIds),
+      Array.from(value),
       null
     );
-    if (doc.conns.size === 0) {
-      // save doc contents before removing doc from memory
-      const xmlFragment = doc.getXmlFragment(doc.name);
-      const content = JSON.stringify(xmlFragment.toJSON());
-
-      saveDocument(content).then(() => {
-        docs.delete(doc.name);
-      });
-    }
   }
+
+  // save doc contents before removing doc from memory
+  const xmlFragment = doc.getXmlFragment(doc.name);
+  const content = JSON.stringify(xmlFragment.toJSON());
+
+  saveDocument(content).then(() => {
+    docs.delete(doc.name);
+  });
 };
 
 export const send = (

@@ -12,13 +12,6 @@ import SessionContainer from "features/practice-session/SessionContainer";
 import SessionHeader from "features/practice-session/SessionHeader";
 import SessionModal from "features/practice-session/SessionModal";
 import { PracticeSession } from "features/practice-session/practice-session.interface";
-import {
-  selectPracticeSession,
-  setQuestion,
-  setHasClickedOnSubmitSession,
-  setHasEnded,
-  setRoomId,
-} from "features/practice-session/practice-session.slice";
 
 export default function Session() {
   const [practiceSession, setPracticeSession] =
@@ -46,14 +39,6 @@ export default function Session() {
     });
   });
 
-  // useEffect(() => {
-  //   // Bring user to session ended page if
-  //   // both users go offline
-  //   if (isPeerOffline && isUserOffline) {
-  //     dispatch(setHasEnded(true));
-  //   }
-  // }, [dispatch, isPeerOffline, isUserOffline]);
-
   useEffect(() => {
     // close is matching modal when user arrives on this page
     dispatch(setIsMatching(false));
@@ -70,13 +55,10 @@ export default function Session() {
       <SessionContainer
         question={practiceSession.question}
         CollaborativeEditorProps={{
-          hasSubmitButton: true,
-          // isSubmitButtonDisabled: isUserOffline,
-          onSubmitButtonClick: () =>
-            dispatch(setHasClickedOnSubmitSession(true)),
+          practiceSession,
         }}
       />
-      <DisconnectedSnackbar />
+      <DisconnectedSnackbar peerDisplayName={practiceSession.peerDisplayName} />
     </>
   );
 }

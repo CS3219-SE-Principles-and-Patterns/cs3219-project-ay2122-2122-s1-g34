@@ -163,17 +163,14 @@ export class SessionsService {
     return this.sessionsRepository.save(updatedSession);
   }
 
-  async handleSessionDisconnecting(
-    sessionId: string,
-    isAnotherUserInSession: boolean
-  ) {
+  async handleSessionDisconnecting(sessionId: string) {
     const session = await this.sessionsRepository
       .createQueryBuilder("session")
       .where("session.id = :sessionId", {
         sessionId,
       })
       .getOne();
-
+    console.log("session: ", session);
     if (!session) {
       return;
     }
@@ -181,12 +178,8 @@ export class SessionsService {
     if (session.status === Status.Open) {
       // delete session if user disconnects even before anyone has joined the room
       await this.sessionsRepository.remove(session);
-    } else if (
-      session.status === Status.InProgress &&
-      !isAnotherUserInSession
-    ) {
-      // close session if both users disconnected
-      // TODO: maybe don't close immediately (?)
+    } else if (session.status === Status.InProgress) {
+      // close session if a single user disconnects while session is in progress
       session.status = Status.Closed;
       await this.sessionsRepository.save(session);
     }

@@ -5,33 +5,25 @@ import React from "react";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
-import { useAppSelector } from "common/hooks/use-redux.hook";
 import { useSocket } from "common/hooks/use-socket.hook";
 
+import RunCodeButton from "features/collaboration/RunCodeButton";
 import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
-import { selectPracticeSession } from "features/practice-session/practice-session.slice";
-
-import RunCodeButton from "./RunCodeButton";
+import { PracticeSession } from "features/practice-session/practice-session.interface";
 
 export interface CollaborativeEditorProps extends BoxProps {
-  hasSubmitButton?: boolean;
-  isSubmitButtonDisabled?: boolean;
-  onSubmitButtonClick?: () => void;
-  readOnly?: boolean;
   defaultValue?: string;
+  practiceSession?: PracticeSession;
+  readOnly?: boolean;
 }
 
 export default function CollaborativeEditor({
-  sx,
-  hasSubmitButton,
-  isSubmitButtonDisabled,
-  onSubmitButtonClick,
   defaultValue,
+  practiceSession,
   readOnly,
+  sx,
   ...rest
 }: CollaborativeEditorProps) {
-  const practiceSession = useAppSelector(selectPracticeSession);
-
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const { socket } = useSocket();
 
@@ -42,10 +34,10 @@ export default function CollaborativeEditor({
       editor.updateOptions({ readOnly: true });
     }
 
-    if (socket && practiceSession.roomId && !readOnly) {
+    if (socket && practiceSession?.id && !readOnly) {
       const ydocument = new Y.Doc();
       const provider = new SocketIoProvider(socket, ydocument);
-      const type = ydocument.getText(practiceSession.roomId);
+      const type = ydocument.getText(practiceSession.id);
 
       // Bind Yjs to the editor model
       new MonacoBinding(
@@ -109,29 +101,6 @@ export default function CollaborativeEditor({
         onMount={handleEditorDidMount}
         defaultValue={defaultValue}
       />
-      {hasSubmitButton && (
-        <Button
-          variant="contained"
-          size="small"
-          sx={{
-            position: "absolute",
-            borderRadius: 40,
-            paddingX: 2,
-            fontSize: 18,
-            fontWeight: "regular",
-            color: "lightGray.main",
-            backgroundColor: "green.main",
-            textTransform: "none",
-            bottom: 10,
-            right: 10,
-            zIndex: 50,
-          }}
-          onClick={onSubmitButtonClick}
-          disabled={isSubmitButtonDisabled}
-        >
-          Submit
-        </Button>
-      )}
     </Box>
   );
 }

@@ -19,18 +19,39 @@ export class PracticeService {
     @Inject("PRACTICE_SERVICE") private natsClient: ClientProxy
   ) {}
 
-  private async handleSocketDisconnecting(client: Socket, server: Server) {
+  private async handleSocketDisconnecting(
+    reason: string,
+    client: Socket,
+    server: Server
+  ) {
     const room = client.data.sessionId;
     const socketsInRoom = await server.in(room).fetchSockets();
+    if (
+      reason !== "ping timeout" &&
+      reason !== "transport close" &&
+      reason !== "transport error"
+    ) {
+      // end the session if the socket was intentionally disconnected by a user
 
-    // disconnect collaboration
-    this.collaborationService.handleDisconnecting(client);
+      // disconnect collaboration
+      this.collaborationService.handleDisconnecting(client);
 
-    // disconnect practice session
-    this.natsClient.emit("handleSessionDisconnecting", {
-      sessionId: room,
-      isAnotherUserInSession: socketsInRoom.length >= 2,
-    });
+      // disconnect practice session
+      this.natsClient.emit("handleSessionDisconnecting", room);
+
+      socketsInRoom.forEach((socket) => {
+        if (socket.data.userId !== client.data.userId) {
+          socket.emit("practice:ended");
+        }
+      });
+    } else {
+      // socket was disconnected from network issues and other non purposeful reasons
+      socketsInRoom.forEach((socket) => {
+        if (socket.data.userId !== client.data.userId) {
+          socket.emit("practice:peer-lost-connection");
+        }
+      });
+    }
   }
 
   private async withPeerDisplayName(session: Session, callerUserId: string) {
@@ -80,8 +101,8 @@ export class PracticeService {
           }
         });
 
-      client.on("disconnecting", () => {
-        this.handleSocketDisconnecting(client, server);
+      client.on("disconnecting", (reason) => {
+        this.handleSocketDisconnecting(reason, client, server);
       });
     } catch (e) {
       client.disconnect();
@@ -89,7 +110,10 @@ export class PracticeService {
     }
   }
 
-  joinSession(user: admin.auth.DecodedIdToken, joinSessionDto: JoinSessionDto) {
+  async joinSession(
+    user: admin.auth.DecodedIdToken,
+    joinSessionDto: JoinSessionDto
+  ) {
     return this.natsClient
       .send("joinSession", {
         userId: user.uid,
@@ -109,11 +133,19 @@ export class PracticeService {
     });
   }
 
-  async practiceInit(client: Socket) {
+  async practiceInit(client: Socket, server: Server) {
     this.collaborationService.handleConnection(client);
     const session = await firstValueFrom(
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
     );
+
+    const room = client.data.sessionId;
+    const socketsInRoom = await server.in(room).fetchSockets();
+    socketsInRoom.forEach((socket) => {
+      if (socket.data.userId !== client.data.userId) {
+        socket.emit("practice:peer-joined");
+      }
+    });
 
     return this.withPeerDisplayName(session, client.data.userId);
   }

@@ -3,25 +3,51 @@ import { IconButton, Snackbar, Typography, Box } from "@mui/material";
 import { useState, useEffect } from "react";
 
 import { useAppSelector } from "common/hooks/use-redux.hook";
+import { useSocket } from "common/hooks/use-socket.hook";
 
-import { selectPracticeSession } from "./practice-session.slice";
+import { selectUser } from "features/auth/user.slice";
 
-export default function DisconnectedSnackbar() {
-  const practiceSession = useAppSelector(selectPracticeSession);
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+interface DisconnectedSnackbarProps {
+  peerDisplayName: string;
+}
 
-  const { isPeerOffline, peerTwo, isUserOffline } = practiceSession;
+export default function DisconnectedSnackbar({
+  peerDisplayName,
+}: DisconnectedSnackbarProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [disconnectedUser, setDisconnectedUser] = useState<string>();
+  const user = useAppSelector(selectUser);
+  const { socket } = useSocket();
 
   useEffect(() => {
-    setIsSnackbarOpen(isPeerOffline);
-  }, [isPeerOffline]);
+    if (socket) {
+      socket.on("practice:peer-lost-connection", () => {
+        // peer has lost connection
+        setDisconnectedUser(peerDisplayName);
+        setIsOpen(true);
+      });
 
-  useEffect(() => {
-    setIsSnackbarOpen(isUserOffline);
-  }, [isUserOffline]);
+      socket.on("disconnect", (reason) => {
+        if (
+          reason !== "io server disconnect" &&
+          reason !== "io client disconnect" &&
+          user
+        ) {
+          // user has lost connection but not purposefully left the room
+          setDisconnectedUser(user.id);
+          setIsOpen(true);
+        }
+      });
+
+      socket.on("practice:peer-joined", () => {
+        // peer rejoined session
+        setIsOpen(false);
+      });
+    }
+  }, [socket, peerDisplayName, user]);
 
   return (
-    <Snackbar open={isSnackbarOpen}>
+    <Snackbar open={isOpen}>
       <Box
         sx={{
           display: "flex",
@@ -33,8 +59,10 @@ export default function DisconnectedSnackbar() {
         }}
       >
         <Typography sx={{ marginRight: 2 }}>
-          {isUserOffline ? "Your" : `${peerTwo?.displayName}'s`} connection is
-          unstable.
+          {(user && user.id) === disconnectedUser
+            ? "Your"
+            : `${disconnectedUser}'s`}{" "}
+          connection is unstable.
           <br />
           Trying to re-connect...
         </Typography>
@@ -43,15 +71,13 @@ export default function DisconnectedSnackbar() {
           size="small"
           aria-label="close"
           color="inherit"
-          onClick={handleClose}
+          onClick={() => {
+            setIsOpen(false);
+          }}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
       </Box>
     </Snackbar>
   );
-
-  function handleClose() {
-    setIsSnackbarOpen(false);
-  }
 }
