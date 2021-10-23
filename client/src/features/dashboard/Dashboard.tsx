@@ -195,10 +195,7 @@ export default function Dashboard() {
       dispatch(setHasTimeout(false));
       dispatch(setDifficulty(difficulty));
     } catch (e: any) {
-      if (
-        e?.response?.data?.message &&
-        typeof e?.response?.data?.message === "object"
-      ) {
+      if (e?.response?.data?.message) {
         open({ message: e.response.data.message, severity: "error" });
       } else {
         open({
