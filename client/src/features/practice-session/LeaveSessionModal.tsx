@@ -1,6 +1,6 @@
 import { Typography, Button, Box } from "@mui/material";
 import React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import Modal from "common/components/Modal";
 import { useAppSelector } from "common/hooks/use-redux.hook";
@@ -25,6 +25,7 @@ export default function LeaveSessionModal({
   const [hasEnded, setHasEnded] = React.useState(hasSessionEnded);
   const user = useAppSelector(selectUser);
   const { socket } = useSocket();
+  const history = useHistory();
 
   React.useEffect(() => {
     setHasEnded(hasSessionEnded);
@@ -84,8 +85,9 @@ export default function LeaveSessionModal({
                 fontSize: 20,
                 fontWeight: 600,
               }}
-              component={RouterLink}
-              to={`/past-attempts/${practiceSession.id}`}
+              onClick={() => {
+                history.replace(`/past-attempts/${practiceSession.id}`);
+              }}
             >
               Click to view attempt
             </Button>
@@ -101,8 +103,9 @@ export default function LeaveSessionModal({
                 fontWeight: 600,
                 color: "blue.main",
               }}
-              component={RouterLink}
-              to="/"
+              onClick={() => {
+                history.replace(`/`);
+              }}
             >
               Go back to dashboard
             </Button>
