@@ -9,6 +9,7 @@ import { CollaborationService } from "src/collaboration/collaboration.service";
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
 import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
+import { Session } from "./interfaces/session.interface";
 
 @Injectable()
 export class PracticeService {
@@ -30,6 +31,17 @@ export class PracticeService {
       sessionId: room,
       isAnotherUserInSession: socketsInRoom.length >= 2,
     });
+  }
+
+  private async withPeerDisplayName(session: Session, callerUserId: string) {
+    const peerId = session.allowedUserIds.find(
+      (userId) => userId !== callerUserId
+    );
+    const peer = await this.firebaseService.getUserInformation(peerId);
+
+    delete session.allowedUserIds;
+
+    return { ...session, peerDisplayName: peer.displayName };
   }
 
   async handleSocketConnection(client: Socket, server: Server) {
@@ -99,32 +111,22 @@ export class PracticeService {
 
   async practiceInit(client: Socket) {
     this.collaborationService.handleConnection(client);
-    return firstValueFrom(
+    const session = await firstValueFrom(
       this.natsClient.send("findOneInProgressSession", client.data.sessionId)
     );
+
+    return this.withPeerDisplayName(session, client.data.userId);
   }
 
   async findAll(user: admin.auth.DecodedIdToken) {
-    const practices = await firstValueFrom<
-      {
-        id: string;
-        allowedUserIds: string[];
-        difficulty: string;
-        question: { title: string };
-      }[]
-    >(this.natsClient.send("findAllClosedSessions", user.uid));
+    const practices = await firstValueFrom<Session[]>(
+      this.natsClient.send("findAllClosedSessions", user.uid)
+    );
 
     // get peer display name
-    const practicesWithDisplayName = practices.map(async (practice) => {
-      const peerId = practice.allowedUserIds.find(
-        (userId) => userId !== user.uid
-      );
-      const peer = await this.firebaseService.getUserInformation(peerId);
-
-      delete practice.allowedUserIds;
-
-      return { ...practice, peerDisplayName: peer.displayName };
-    });
+    const practicesWithDisplayName = practices.map(async (practice) =>
+      this.withPeerDisplayName(practice, user.uid)
+    );
 
     const resolved = await Promise.all(practicesWithDisplayName);
 
@@ -132,28 +134,11 @@ export class PracticeService {
   }
 
   async findOne(user: admin.auth.DecodedIdToken, id: string) {
-    const practice = await firstValueFrom<{
-      id: string;
-      allowedUserIds: string[];
-      difficulty: string;
-      code: string;
-      question: {
-        title: string;
-        questionHtml: string;
-        answer: string;
-        notes: { note: string }[];
-      };
-    }>(this.natsClient.send("findOneClosedSession", { userId: user.uid, id }));
-
-    // get peer display name
-    const peerId = practice.allowedUserIds.find(
-      (userId) => userId !== user.uid
+    const practice = await firstValueFrom<Session>(
+      this.natsClient.send("findOneClosedSession", { userId: user.uid, id })
     );
-    const peer = await this.firebaseService.getUserInformation(peerId);
 
-    delete practice.allowedUserIds;
-
-    return { ...practice, peerDisplayName: peer.displayName };
+    return this.withPeerDisplayName(practice, user.uid);
   }
 
   updateSessionNote(

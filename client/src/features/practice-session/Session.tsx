@@ -1,5 +1,5 @@
 import { LinearProgress } from "@mui/material";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { io } from "socket.io-client";
 
 import { useAppDispatch, useAppSelector } from "common/hooks/use-redux.hook";
@@ -8,8 +8,10 @@ import { useSocket, useOnSocketConnect } from "common/hooks/use-socket.hook";
 import { selectUser } from "features/auth/user.slice";
 import { setIsMatching } from "features/matching/matching.slice";
 import DisconnectedSnackbar from "features/practice-session/DisconnectedSnackbar";
+import SessionContainer from "features/practice-session/SessionContainer";
 import SessionHeader from "features/practice-session/SessionHeader";
 import SessionModal from "features/practice-session/SessionModal";
+import { PracticeSession } from "features/practice-session/practice-session.interface";
 import {
   selectPracticeSession,
   setQuestion,
@@ -18,49 +20,46 @@ import {
   setRoomId,
 } from "features/practice-session/practice-session.slice";
 
-import SessionContainer from "./SessionContainer";
-
 export default function Session() {
+  const [practiceSession, setPracticeSession] =
+    React.useState<PracticeSession>();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
-  const practiceSession = useAppSelector(selectPracticeSession);
-  const { setSocket } = useSocket();
-
-  const { question, isPeerOffline, isUserOffline } = practiceSession;
+  const { socket, setSocket } = useSocket();
 
   useEffect(() => {
-    if (user) {
+    if (user && !socket) {
+      // connect to socket if no existing connection exists
       const newSocket = io({
         extraHeaders: { token: user.token },
       });
 
       setSocket(newSocket);
     }
-  }, [user, setSocket]);
+  }, [user, setSocket, socket]);
 
   useOnSocketConnect((client) => {
-    client.emit("practice:init", undefined, (response: any) => {
+    client.emit("practice:init", undefined, (response: PracticeSession) => {
       if (response) {
-        dispatch(setRoomId(response.id));
-        dispatch(setQuestion(response.question));
+        setPracticeSession(response);
       }
     });
   });
 
-  useEffect(() => {
-    // Bring user to session ended page if
-    // both users go offline
-    if (isPeerOffline && isUserOffline) {
-      dispatch(setHasEnded(true));
-    }
-  }, [dispatch, isPeerOffline, isUserOffline]);
+  // useEffect(() => {
+  //   // Bring user to session ended page if
+  //   // both users go offline
+  //   if (isPeerOffline && isUserOffline) {
+  //     dispatch(setHasEnded(true));
+  //   }
+  // }, [dispatch, isPeerOffline, isUserOffline]);
 
   useEffect(() => {
     // close is matching modal when user arrives on this page
     dispatch(setIsMatching(false));
   }, [dispatch]);
 
-  if (!question) {
+  if (!practiceSession) {
     return <LinearProgress />;
   }
 
@@ -69,10 +68,10 @@ export default function Session() {
       <SessionModal />
       <SessionHeader />
       <SessionContainer
-        question={question}
+        question={practiceSession.question}
         CollaborativeEditorProps={{
           hasSubmitButton: true,
-          isSubmitButtonDisabled: isUserOffline,
+          // isSubmitButtonDisabled: isUserOffline,
           onSubmitButtonClick: () =>
             dispatch(setHasClickedOnSubmitSession(true)),
         }}
