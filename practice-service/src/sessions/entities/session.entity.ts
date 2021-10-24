@@ -1,4 +1,3 @@
-import { SessionNote } from "src/session-notes/entities/session-note.entity";
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +9,7 @@ import {
 } from "typeorm";
 
 import { Difficulty, Question } from "../../questions/entities/question.entity";
+import { SessionNote } from "../../session-notes/entities/session-note.entity";
 
 export enum Status {
   Open = "open", // open with one user waiting for another to join

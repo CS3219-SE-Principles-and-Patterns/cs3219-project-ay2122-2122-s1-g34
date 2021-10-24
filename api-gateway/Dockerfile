@@ -7,6 +7,7 @@ COPY package.json yarn.lock ./
 RUN yarn global add firebase-tools
 RUN yarn install
 COPY . .
+ENV NODE_ENV production
 RUN yarn build
 
 EXPOSE 5000
