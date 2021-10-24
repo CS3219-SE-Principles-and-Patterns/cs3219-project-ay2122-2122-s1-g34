@@ -12,7 +12,9 @@ services:
 
   api-gateway:
     restart: always
-    build: ./api-gateway
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile.development
     command: sh -c "yarn install && yarn start:dev & firebase emulators:start --import=./firebase-emulator-data --export-on-exit"
     ports:
       - 5000:5000
@@ -62,7 +64,6 @@ services:
 
   nats:
     restart: always
-    entrypoint: "/nats-server -c nats-server.conf -DV"
     image: nats
     logging:
       driver: none
