@@ -23,9 +23,11 @@ export default function DashboardCard({
   const disabledStyle = !disabled
     ? {
         boxShadow: `-4px 4px 3px ${themePalette[outlineColor].main}`,
+        cursor: "pointer",
       }
     : {
         backgroundColor: `${themePalette.lightGray.main}`,
+        cursor: "not-allowed",
       };
 
   return (
@@ -40,11 +42,10 @@ export default function DashboardCard({
         width: 240,
         ...disabledStyle,
         justifyContent: "center",
-        cursor: "pointer",
         textDecoration: "none",
       }}
       borderColor={`${outlineColor}.main`}
-      onClick={onCardClick}
+      onClick={disabled ? undefined : onCardClick}
       component={component}
       to={to}
     >

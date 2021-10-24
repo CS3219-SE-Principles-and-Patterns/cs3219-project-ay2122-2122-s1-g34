@@ -123,10 +123,16 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
         borderStyle: "solid",
         borderColor: "blue.main",
         padding: 2,
+        display: "flex",
+        flexGrow: 1,
+        flexDirection: "column",
       }}
     >
-      <Stack spacing={2}>
-        <Typography variant="h6" sx={{ marginBottom: 3, fontWeight: "bold" }}>
+      <Stack
+        spacing={2}
+        sx={{ display: "flex", flexGrow: 1, flexDirection: "column" }}
+      >
+        <Typography variant="h6" sx={{ marginBottom: 2, fontWeight: "bold" }}>
           Chat
         </Typography>
         <Box>
@@ -142,8 +148,7 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
         <Box
           display="flex"
           flexDirection="column-reverse"
-          height="400px"
-          sx={{ overflow: "hidden", overflowY: "scroll" }}
+          sx={{ overflow: "hidden", overflowY: "scroll", flexGrow: 1 }}
         >
           {/* Order of bottom is reversed as we are using column-reverse */}
           <div ref={messagesEndRef} />
@@ -177,7 +182,7 @@ export default function ChatBox({ sx, ...rest }: ChatBoxProps) {
               },
               "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                 {
-                  borderColor: "#67A0AC",
+                  borderColor: "blue.main",
                   borderRadius: 0,
                   borderLeft: 0,
                   borderRight: 0,

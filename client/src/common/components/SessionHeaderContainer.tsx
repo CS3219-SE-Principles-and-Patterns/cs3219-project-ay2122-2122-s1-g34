@@ -17,7 +17,7 @@ export default function SessionHeaderContainer({
   peerDisplayName,
 }: SessionHeaderContainerProps) {
   const user = useAppSelector(selectUser);
-
+  
   if (!user) {
     return null;
   }
@@ -27,7 +27,7 @@ export default function SessionHeaderContainer({
       <Grid
         container
         item
-        xs={2}
+        xs={8}
         sx={{
           alignItems: "center",
           justifyContent: "center",
@@ -46,7 +46,7 @@ export default function SessionHeaderContainer({
               display: "flex",
               flex: 1,
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "flex-end",
             }}
           >
             <Typography
@@ -64,7 +64,7 @@ export default function SessionHeaderContainer({
               display: "flex",
               flex: 1,
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "flex-start",
             }}
           >
             <Typography
