@@ -21,10 +21,7 @@ services:
       - 9099:9099
     volumes:
       - ./api-gateway:/app
-    environment:
-      FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
-      NODE_ENV: development
-      PORT: 5000
+    env_file: ./api-gateway/.env
 
   collaboration-service:
     restart: always
@@ -33,8 +30,7 @@ services:
     working_dir: /app
     volumes:
       - ./collaboration-service:/app
-    environment:
-      NODE_ENV: development
+    env_file: ./collaboration-service/.env
 
   practice-service:
     restart: always

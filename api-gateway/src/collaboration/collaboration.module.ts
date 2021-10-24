@@ -5,6 +5,10 @@ import { CollaborationController } from "./collaboration.controller";
 import { CollaborationGateway } from "./collaboration.gateway";
 import { CollaborationService } from "./collaboration.service";
 
+console.log(
+  "process.env.COLLABORATION_NATS_QUEUE: ",
+  process.env.COLLABORATION_NATS_QUEUE
+);
 @Module({
   imports: [
     ClientsModule.register([
@@ -12,8 +16,8 @@ import { CollaborationService } from "./collaboration.service";
         name: "COLLABORATION_SERVICE",
         transport: Transport.NATS,
         options: {
-          servers: ["nats://nats:4222"],
-          queue: "collaboration_queue",
+          servers: [process.env.NATS_SERVER],
+          queue: process.env.COLLABORATION_NATS_QUEUE,
         },
       },
     ]),
