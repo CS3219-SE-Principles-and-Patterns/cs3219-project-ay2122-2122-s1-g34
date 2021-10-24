@@ -6,7 +6,11 @@ import { Question } from "./questions/entities/question.entity";
 import { SessionNote } from "./session-notes/entities/session-note.entity";
 import { Session } from "./sessions/entities/session.entity";
 
-const data = dotenv.parse(fs.readFileSync(".env"));
+const data: any = dotenv.parse(
+  fs.readFileSync(
+    process.env.NODE_ENV === "production" ? ".env.production" : ".env"
+  )
+);
 
 const config: ConnectionOptions = {
   type: "postgres",
@@ -16,15 +20,13 @@ const config: ConnectionOptions = {
   password: data.POSTGRES_PASSWORD,
   database: data.POSTGRES_USER,
   entities: [Question, Session, SessionNote],
-  synchronize: process.env.NODE_ENV === "development",
+  synchronize: false,
   migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
   cli: {
     // Location of migration should be inside src folder
     // to be compiled into dist/ folder.
     migrationsDir: __dirname + "/migrations",
   },
-  // Automatically run migrations
-  migrationsRun: true,
 };
 
 export default config;
