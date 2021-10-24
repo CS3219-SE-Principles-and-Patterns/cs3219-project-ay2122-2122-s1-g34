@@ -3,9 +3,10 @@ version: "3.7"
 services:
   client:
     restart: always
+    image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/client
     build: ./client
     ports:
-      - 3000:80
+      - 80:80
     x-aws-autoscaling:
       min: 1
       max: 3
@@ -13,6 +14,7 @@ services:
 
   api-gateway:
     restart: always
+    image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/api-gateway
     build: ./api-gateway
     env_file: ./api-gateway/.env.production
     depends_on:
@@ -25,6 +27,7 @@ services:
 
   collaboration-service:
     restart: always
+    image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/collaboration-service
     build: ./collaboration-service
     env_file: ./collaboration-service/.env.production
     depends_on:
@@ -36,8 +39,9 @@ services:
 
   practice-service:
     restart: always
+    image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/practice-service
     build: ./practice-service
-    command: sh -c "yarn run seed && yarn start:prod"
+    command: sh -c "NODE_ENV=production yarn run typeorm:migrate && NODE_ENV=production yarn run seed && yarn start:prod"
     env_file: ./practice-service/.env.production
     depends_on:
       - "nats"
@@ -49,6 +53,7 @@ services:
 
   code-runner-service:
     restart: always
+    image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/code-runner-service
     build: ./code-runner-service
     environment:
       NODE_ENV: production
