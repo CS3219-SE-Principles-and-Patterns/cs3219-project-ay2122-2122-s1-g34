@@ -41,6 +41,16 @@ services:
       - ./practice-service:/app
     env_file: ./practice-service/.env
 
+  code-runner-service:
+    restart: always
+    image: node:14-alpine
+    command: sh -c "yarn install && yarn start:dev"
+    working_dir: /app
+    volumes:
+      - ./code-runner-service:/app
+    environment:
+      NODE_ENV: development
+
   practice-service-postgres:
     restart: always
     env_file: ./practice-service/.env
@@ -49,14 +59,6 @@ services:
       - practice-service-postgres-dev:/var/lib/postgresql/data
     ports:
       - 5432:5432
-
-  code-runner-service:
-    restart: always
-    image: node:14-alpine
-    command: sh -c "yarn install && yarn start:dev"
-    working_dir: /app
-    volumes:
-      - ./code-runner-service:/app
 
   nats:
     restart: always
@@ -68,6 +70,10 @@ services:
       - "4222:4222"
       - "6222:6222"
       - "8222:8222"
+
+  redis:
+    restart: always
+    image: redis:alpine
 
 volumes:
   practice-service-postgres-dev:
