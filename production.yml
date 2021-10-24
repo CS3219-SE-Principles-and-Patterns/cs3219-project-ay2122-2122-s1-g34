@@ -1,0 +1,90 @@
+version: "3.7"
+
+services:
+  client:
+    restart: always
+    build: ./client
+    ports:
+      - 3000:80
+    x-aws-autoscaling:
+      min: 1
+      max: 3
+      cpu: 75
+
+  api-gateway:
+    restart: always
+    build: ./api-gateway
+    env_file: ./api-gateway/.env.production
+    depends_on:
+      - "nats"
+      - "redis"
+    x-aws-autoscaling:
+      min: 1
+      max: 3
+      cpu: 75
+
+  collaboration-service:
+    restart: always
+    build: ./collaboration-service
+    env_file: ./collaboration-service/.env.production
+    depends_on:
+      - "nats"
+    x-aws-autoscaling:
+      min: 1
+      max: 3
+      cpu: 75
+
+  practice-service:
+    restart: always
+    build: ./practice-service
+    command: sh -c "yarn run seed && yarn start:prod"
+    env_file: ./practice-service/.env.production
+    depends_on:
+      - "nats"
+      - "practice-service-postgres"
+    x-aws-autoscaling:
+      min: 1
+      max: 3
+      cpu: 75
+
+  code-runner-service:
+    restart: always
+    build: ./code-runner-service
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - "nats"
+    x-aws-autoscaling:
+      min: 1
+      max: 3
+      cpu: 75
+
+  practice-service-postgres:
+    restart: always
+    env_file: ./practice-service/.env.production
+    image: postgres:12
+    volumes:
+      - practice-service-postgres:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    deploy:
+      replicas: 1
+
+  nats:
+    restart: always
+    image: nats
+    expose:
+      - "4222"
+      - "6222"
+      - "8222"
+    deploy:
+      replicas: 1
+
+  redis:
+    restart: always
+    image: redis:alpine
+    deploy:
+      replicas: 1
+
+volumes:
+  practice-service-postgres:

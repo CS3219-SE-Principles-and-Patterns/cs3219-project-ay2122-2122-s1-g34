@@ -6,7 +6,11 @@ import { Question } from "./questions/entities/question.entity";
 import { SessionNote } from "./session-notes/entities/session-note.entity";
 import { Session } from "./sessions/entities/session.entity";
 
-const data = dotenv.parse(fs.readFileSync(".env"));
+const data: any = dotenv.parse(
+  fs.readFileSync(
+    process.env.NODE_ENV === "production" ? ".env.production" : ".env"
+  )
+);
 
 const config: ConnectionOptions = {
   type: "postgres",
