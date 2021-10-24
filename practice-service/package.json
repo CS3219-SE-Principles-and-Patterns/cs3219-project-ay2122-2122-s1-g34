@@ -18,10 +18,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "echo 'No e2e tests implemented yet.'",
     "typeorm": "ts-node -P ./tsconfig.json ./node_modules/typeorm/cli.js --config ./src/ormconfig.ts",
-    "typeorm:create": "npm run typeorm migration:create -- -n",
-    "typeorm:generate": "npm run typeorm migration:generate -- -n",
-    "typeorm:migrate": "npm run typeorm migration:run",
-    "typeorm:revert": "npm run typeorm migration:revert",
+    "typeorm:create": "yarn run typeorm migration:create -- -n",
+    "typeorm:generate": "yarn run typeorm migration:generate -- -n",
+    "typeorm:migrate": "yarn run typeorm migration:run",
+    "typeorm:revert": "yarn run typeorm migration:revert",
     "seed": "ts-node -r tsconfig-paths/register -P ./tsconfig.json ./src/database-seeding/main.ts"
   },
   "dependencies": {
