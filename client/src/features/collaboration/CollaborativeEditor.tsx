@@ -1,7 +1,8 @@
 import Editor, { OnMount } from "@monaco-editor/react";
-import { Box, BoxProps, Typography, TextField, Button } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { Box, BoxProps, Typography, TextField } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
@@ -10,6 +11,7 @@ import { useSocket } from "common/hooks/use-socket.hook";
 import RunCodeButton from "features/collaboration/RunCodeButton";
 import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
 import { PracticeSession } from "features/practice-session/practice-session.interface";
+import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 export interface CollaborativeEditorProps extends BoxProps {
   defaultValue?: string;
@@ -30,6 +32,39 @@ export default function CollaborativeEditor({
     readOnly ? practiceSession?.question.answer : ""
   );
   const [isUserAnswerCorrect, setIsUserAnswerCorrect] = useState(false);
+  const [isCheckingAnswer, setIsCheckingAnswer] = useState(false);
+  const { open } = useSnackbar();
+
+  useEffect(() => {
+    if (socket) {
+      const callback = ({
+        isCorrect,
+        answer,
+      }: {
+        isCorrect: boolean;
+        answer: string;
+      }) => {
+        setIsUserAnswerCorrect(isCorrect);
+        setIsCheckingAnswer(false);
+        setUserAnswer(answer);
+
+        if (isCorrect) {
+          open({ message: "The answer is correct!" });
+        } else {
+          open({
+            message: "The answer is wrong! Please try again!",
+            severity: "error",
+          });
+        }
+      };
+
+      socket.on("practice:check-answer", callback);
+
+      return () => {
+        socket.off("practice:check-answer", callback);
+      };
+    }
+  }, [socket]);
 
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor;
@@ -106,7 +141,7 @@ export default function CollaborativeEditor({
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value)}
           placeholder="Check answer"
-          disabled={readOnly}
+          disabled={readOnly || isCheckingAnswer}
           sx={{
             display: "flex",
             marginX: 14,
@@ -120,7 +155,8 @@ export default function CollaborativeEditor({
             !readOnly
               ? {
                   endAdornment: (
-                    <Button
+                    <LoadingButton
+                      loading={isCheckingAnswer}
                       variant="contained"
                       size="small"
                       type="submit"
@@ -137,7 +173,7 @@ export default function CollaborativeEditor({
                       onClick={checkAnswerIsCorrect}
                     >
                       Check
-                    </Button>
+                    </LoadingButton>
                   ),
                 }
               : undefined
@@ -155,6 +191,13 @@ export default function CollaborativeEditor({
   );
 
   function checkAnswerIsCorrect() {
-    setIsUserAnswerCorrect(userAnswer === practiceSession?.question.answer);
+    if (socket) {
+      setIsCheckingAnswer(true);
+      try {
+        socket.emit("practice:check-answer", userAnswer);
+      } catch {
+        setIsCheckingAnswer(false);
+      }
+    }
   }
 }
