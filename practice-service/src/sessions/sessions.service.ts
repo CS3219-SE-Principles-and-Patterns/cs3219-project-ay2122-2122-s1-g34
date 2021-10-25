@@ -78,6 +78,7 @@ export class SessionsService {
       })
       .andWhere("session.status = :status", { status: Status.Closed })
       .leftJoin("session.question", "question")
+      .orderBy("session.createdAt", "DESC")
       .getMany();
   }
 
