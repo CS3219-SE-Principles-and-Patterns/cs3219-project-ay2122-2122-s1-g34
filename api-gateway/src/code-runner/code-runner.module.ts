@@ -11,8 +11,8 @@ import { CodeRunnerService } from "./code-runner.service";
         name: "CODE_RUNNER_SERVICE",
         transport: Transport.NATS,
         options: {
-          servers: ["nats://nats:4222"],
-          queue: "code_runner_queue",
+          servers: [process.env.NATS_SERVER],
+          queue: process.env.CODE_RUNNER_NATS_QUEUE,
         },
       },
     ]),

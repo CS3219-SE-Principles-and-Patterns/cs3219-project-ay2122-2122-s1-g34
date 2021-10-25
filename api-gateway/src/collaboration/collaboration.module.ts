@@ -12,8 +12,8 @@ import { CollaborationService } from "./collaboration.service";
         name: "COLLABORATION_SERVICE",
         transport: Transport.NATS,
         options: {
-          servers: ["nats://nats:4222"],
-          queue: "collaboration_queue",
+          servers: [process.env.NATS_SERVER],
+          queue: process.env.COLLABORATION_NATS_QUEUE,
         },
       },
     ]),

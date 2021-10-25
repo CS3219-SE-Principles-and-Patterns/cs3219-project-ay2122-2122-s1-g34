@@ -12,7 +12,9 @@ services:
 
   api-gateway:
     restart: always
-    build: ./api-gateway
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile.development
     command: sh -c "yarn install && yarn start:dev & firebase emulators:start --import=./firebase-emulator-data --export-on-exit"
     ports:
       - 5000:5000
@@ -21,10 +23,7 @@ services:
       - 9099:9099
     volumes:
       - ./api-gateway:/app
-    environment:
-      FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
-      NODE_ENV: development
-      PORT: 5000
+    env_file: ./api-gateway/.env
 
   collaboration-service:
     restart: always
@@ -33,17 +32,26 @@ services:
     working_dir: /app
     volumes:
       - ./collaboration-service:/app
-    environment:
-      NODE_ENV: development
+    env_file: ./collaboration-service/.env
 
   practice-service:
     restart: always
     image: node:14-alpine
-    command: sh -c "yarn install && yarn run seed && yarn start:dev"
+    command: sh -c "yarn install && yarn run typeorm:migrate && yarn run seed && yarn start:dev"
     working_dir: /app
     volumes:
       - ./practice-service:/app
     env_file: ./practice-service/.env
+
+  code-runner-service:
+    restart: always
+    image: node:14-alpine
+    command: sh -c "yarn install && yarn start:dev"
+    working_dir: /app
+    volumes:
+      - ./code-runner-service:/app
+    environment:
+      NODE_ENV: development
 
   practice-service-postgres:
     restart: always
@@ -54,17 +62,8 @@ services:
     ports:
       - 5432:5432
 
-  code-runner-service:
-    restart: always
-    image: node:14-alpine
-    command: sh -c "yarn install && yarn start:dev"
-    working_dir: /app
-    volumes:
-      - ./code-runner-service:/app
-
   nats:
     restart: always
-    entrypoint: "/nats-server -c nats-server.conf -DV"
     image: nats
     logging:
       driver: none
@@ -72,6 +71,10 @@ services:
       - "4222:4222"
       - "6222:6222"
       - "8222:8222"
+
+  redis:
+    restart: always
+    image: redis:alpine
 
 volumes:
   practice-service-postgres-dev:

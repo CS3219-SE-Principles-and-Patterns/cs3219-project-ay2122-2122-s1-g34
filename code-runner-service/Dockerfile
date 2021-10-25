@@ -9,6 +9,4 @@ COPY . .
 ENV NODE_ENV production
 RUN yarn build
 
-EXPOSE 5000
-
 CMD ["yarn", "start:prod"]
