@@ -7,6 +7,7 @@ import { CronJob } from "cron";
 import { QuestionsService } from "src/questions/questions.service";
 import { Repository } from "typeorm";
 
+import { CheckSessionAnswerDto } from "./dto/check-session-answer.dto";
 import { FindOneSessionDto } from "./dto/find-one-session.dto";
 import { HandleSessionDisconnectingDto } from "./dto/handle-session-disconnecting.dto";
 import { JoinSessionDto } from "./dto/join-session.dto";
@@ -174,6 +175,17 @@ export class SessionsService {
   update(updateSessionDto: UpdateSessionDto) {
     const updatedSession = plainToClass(Session, updateSessionDto);
     return this.sessionsRepository.save(updatedSession);
+  }
+
+  async checkAnswer(checkSessionAnswerDto: CheckSessionAnswerDto) {
+    const session = await this.sessionsRepository
+      .createQueryBuilder("session")
+      .select(["session.id", "question.answer"])
+      .leftJoin("session.question", "question")
+      .where("session.id = :id", { id: checkSessionAnswerDto.id })
+      .getOne();
+
+    return session.question.answer === checkSessionAnswerDto.answer;
   }
 
   async handleSessionDisconnecting(

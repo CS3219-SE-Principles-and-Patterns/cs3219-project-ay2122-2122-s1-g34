@@ -1,6 +1,7 @@
 import { Controller } from "@nestjs/common";
 import { EventPattern, MessagePattern, Payload } from "@nestjs/microservices";
 
+import { CheckSessionAnswerDto } from "./dto/check-session-answer.dto";
 import { FindOneSessionDto } from "./dto/find-one-session.dto";
 import { HandleSessionDisconnectingDto } from "./dto/handle-session-disconnecting.dto";
 import { JoinSessionDto } from "./dto/join-session.dto";
@@ -44,6 +45,11 @@ export class SessionsController {
   @MessagePattern("updateSession")
   update(@Payload() updateSessionDto: UpdateSessionDto) {
     return this.sessionsService.update(updateSessionDto);
+  }
+
+  @MessagePattern("checkSessionAnswer")
+  checkAnswer(@Payload() checkSessionAnswerDto: CheckSessionAnswerDto) {
+    return this.sessionsService.checkAnswer(checkSessionAnswerDto);
   }
 
   /**
