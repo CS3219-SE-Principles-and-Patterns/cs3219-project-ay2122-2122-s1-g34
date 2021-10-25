@@ -13,20 +13,28 @@ import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
 import { PracticeSession } from "features/practice-session/practice-session.interface";
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
+function parseJson(str: string) {
+  try {
+    const result = JSON.parse(str);
+    return result;
+  } catch {
+    return str;
+  }
+}
+
 export interface CollaborativeEditorProps extends BoxProps {
-  defaultValue?: string;
-  practiceSession?: PracticeSession;
+  practiceSession: PracticeSession;
   readOnly?: boolean;
 }
 
 export default function CollaborativeEditor({
-  defaultValue,
   practiceSession,
   readOnly,
   sx,
   ...rest
 }: CollaborativeEditorProps) {
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
+  console.log(practiceSession);
   const { socket } = useSocket();
   const [userAnswer, setUserAnswer] = useState(
     readOnly ? practiceSession?.question.answer : ""
@@ -36,7 +44,7 @@ export default function CollaborativeEditor({
   const { open } = useSnackbar();
 
   useEffect(() => {
-    if (socket) {
+    if (socket && !readOnly) {
       const callback = ({
         isCorrect,
         answer,
@@ -64,7 +72,7 @@ export default function CollaborativeEditor({
         socket.off("practice:check-answer", callback);
       };
     }
-  }, [socket]);
+  }, [socket, readOnly, open]);
 
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor;
@@ -140,7 +148,7 @@ export default function CollaborativeEditor({
           type="text"
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value)}
-          placeholder="Check answer"
+          label="Answer"
           disabled={readOnly || isCheckingAnswer}
           sx={{
             display: "flex",
@@ -185,7 +193,7 @@ export default function CollaborativeEditor({
       <Editor
         defaultLanguage="javascript"
         onMount={handleEditorDidMount}
-        defaultValue={defaultValue}
+        defaultValue={parseJson(practiceSession.code)}
       />
     </Box>
   );
