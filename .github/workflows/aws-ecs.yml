@@ -93,7 +93,7 @@ jobs:
           ECR_REPOSITORY: peerprep/practice-service
           ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-PracticeserviceService-6vp5otWHwqjG
           IMAGE_TAG: latest
-        working-directory: ./practice-services
+        working-directory: ./practice-service
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
