@@ -30,10 +30,6 @@ export class PracticeController {
   joinSession(@User() user, @Body() joinSessionDto: JoinSessionDto) {
     return this.practiceService.joinSession(user, joinSessionDto);
   }
-  @Get("test")
-  test() {
-    return "testing 1 2 3";
-  }
 
   @Get()
   @UseGuards(AuthGuard)
