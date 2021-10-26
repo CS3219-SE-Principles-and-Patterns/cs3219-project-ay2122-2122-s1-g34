@@ -65,5 +65,6 @@ jobs:
           docker context create ecs ecscontext --from-env
 
       - name: Deploy to ECS
+        continue-on-error: true
         run: |
           docker --context ecscontext compose -f production.yml up
