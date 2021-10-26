@@ -32,7 +32,7 @@ export class PracticeController {
   }
   @Get("test")
   test() {
-    return "test";
+    return "testing 1 2 3";
   }
 
   @Get()
