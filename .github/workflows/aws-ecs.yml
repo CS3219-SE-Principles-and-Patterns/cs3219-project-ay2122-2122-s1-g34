@@ -57,8 +57,9 @@ jobs:
       - name: Docker Build
         id: docker-build
         uses: docker/build-push-action@v2
+        working-directory: ./api-gateway
         with:
-          context: ./api-gateway
+          context: ./
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: false
