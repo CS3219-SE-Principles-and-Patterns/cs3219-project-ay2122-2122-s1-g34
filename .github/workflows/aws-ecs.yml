@@ -1,9 +1,8 @@
 name: Deploy to Amazon ECS
 
-on: workflow_dispatch
-  # push:
-  #   branches:
-  #     - main
+push:
+  branches:
+    - dev
 
 env:
   AWS_REGION: ap-southeast-1
@@ -58,4 +57,4 @@ jobs:
           AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
         run: |
           docker context create ecs ecscontext --from-env
-          docker --context ecscontext compose -f production.yml up
+          docker --debug --context ecscontext compose -f production.yml up
