@@ -22,11 +22,7 @@ export default function MatchingModal() {
   const { isMatching, hasTimeout, matchedPeer } = matching;
 
   return (
-    <Modal
-      isOpen={isMatching}
-      handleClose={() => console.log("On press outside")}
-      outlineColor={"red"}
-    >
+    <Modal isOpen={isMatching} outlineColor={"red"}>
       <Box
         width={400}
         sx={{

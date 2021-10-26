@@ -74,7 +74,9 @@ export default function CollaborativeEditor({
     }
   }, [socket, readOnly, open]);
 
-  const handleEditorDidMount: OnMount = (editor) => {
+  const handleEditorDidMount: (
+    editor: monaco.editor.IStandaloneCodeEditor
+  ) => void = (editor) => {
     editorRef.current = editor;
 
     if (readOnly) {

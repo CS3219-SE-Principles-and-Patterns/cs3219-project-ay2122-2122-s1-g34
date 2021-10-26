@@ -2,9 +2,7 @@ version: "3.7"
 
 services:
   client:
-    restart: always
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/client
-    build: ./client
     ports:
       - 80:80
     x-aws-autoscaling:
@@ -26,9 +24,7 @@ services:
       cpu: 75
 
   collaboration-service:
-    restart: always
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/collaboration-service
-    build: ./collaboration-service
     env_file: ./collaboration-service/.env.production
     depends_on:
       - "nats"
@@ -38,9 +34,7 @@ services:
       cpu: 75
 
   practice-service:
-    restart: always
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/practice-service
-    build: ./practice-service
     command: sh -c "NODE_ENV=production yarn run typeorm:migrate && NODE_ENV=production yarn run seed && yarn start:prod"
     env_file: ./practice-service/.env.production
     depends_on:
@@ -52,9 +46,7 @@ services:
       cpu: 75
 
   code-runner-service:
-    restart: always
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/code-runner-service
-    build: ./code-runner-service
     environment:
       NODE_ENV: production
     depends_on:
@@ -65,7 +57,6 @@ services:
       cpu: 75
 
   practice-service-postgres:
-    restart: always
     env_file: ./practice-service/.env.production
     image: postgres:12
     volumes:
@@ -76,17 +67,11 @@ services:
       replicas: 1
 
   nats:
-    restart: always
     image: nats
-    expose:
-      - "4222"
-      - "6222"
-      - "8222"
     deploy:
       replicas: 1
 
   redis:
-    restart: always
     image: redis:alpine
     deploy:
       replicas: 1
