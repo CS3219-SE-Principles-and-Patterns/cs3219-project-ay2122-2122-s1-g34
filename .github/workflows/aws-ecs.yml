@@ -54,4 +54,5 @@ jobs:
       - name: Deploy Amazon ECS task definition
         run: |
           docker context create ecs ecscontext --from-env
-          docker --context ecscontext compose -f production.yml up
+          docker context use ecscontext
+          docker compose -f "production.yml" up
