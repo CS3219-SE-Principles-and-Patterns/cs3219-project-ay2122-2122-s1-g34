@@ -32,11 +32,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Create .env.production
+      - name: Create .env files
         env:
           ENV: ${{ secrets.ENV }}
+          REACT_APP_ENV: ${{ secrets.REACT_APP_ENV }}
         run: |
           echo "$ENV" > .env.production
+          echo "$REACT_APP_ENV" > client/.env
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
