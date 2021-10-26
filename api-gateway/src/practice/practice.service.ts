@@ -159,6 +159,25 @@ export class PracticeService {
     return this.withPeerDisplayName(session, client.data.userId);
   }
 
+  async checkAnswer(answer: string, client: Socket, server: Server) {
+    try {
+      const isCorrect = await firstValueFrom<boolean>(
+        this.natsClient.send("checkSessionAnswer", {
+          id: client.data.sessionId,
+          answer,
+        })
+      );
+
+      return server
+        .to(client.data.sessionId)
+        .emit("practice:check-answer", { answer, isCorrect });
+    } catch {
+      return server
+        .to(client.data.sessionId)
+        .emit("practice:check-answer", { answer, isCorrect: false });
+    }
+  }
+
   async findAll(user: admin.auth.DecodedIdToken) {
     const sessions = await firstValueFrom<Session[]>(
       this.natsClient.send("findAllClosedSessions", user.uid)
