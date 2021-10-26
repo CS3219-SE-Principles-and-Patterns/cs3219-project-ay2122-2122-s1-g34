@@ -57,10 +57,9 @@ jobs:
       - name: Docker Build
         id: docker-build
         uses: docker/build-push-action@v2
-        working-directory: ./api-gateway
         with:
-          context: ./
-          file: ./Dockerfile
+          context: ./api-gateway
+          file: Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: false
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
