@@ -1,6 +1,8 @@
 import { Box, Container } from "@mui/material";
+import React from "react";
 
 import QuestionDisplay from "common/components/QuestionDisplay";
+import { useOnSocketDisconnect } from "common/hooks/use-socket.hook";
 
 import CollaborativeEditor, {
   CollaborativeEditorProps,
@@ -8,6 +10,7 @@ import CollaborativeEditor, {
 import SessionNotes from "features/past-attempts/SessionNotes";
 import { Notes } from "features/past-attempts/notes.type";
 import ChatBox from "features/practice-session/ChatBox";
+import LostConnectionPage from "features/practice-session/LostConnectionPage";
 import { Question } from "features/practice-session/question.interface";
 
 interface SessionContainerProps {
@@ -21,6 +24,22 @@ export default function SessionContainer({
   notes,
   CollaborativeEditorProps,
 }: SessionContainerProps) {
+  const [isLostConnection, setIsLostConnection] = React.useState(false);
+
+  useOnSocketDisconnect((reason) => {
+    if (
+      reason !== "io server disconnect" &&
+      reason !== "io client disconnect"
+    ) {
+      // user has lost connection but not purposefully left the room
+      setIsLostConnection(true);
+    }
+  });
+
+  if (isLostConnection) {
+    return <LostConnectionPage />;
+  }
+
   return (
     <Container
       fixed
