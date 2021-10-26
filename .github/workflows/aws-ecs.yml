@@ -25,16 +25,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+      - name: Write secrets to file
+        env:
+          TEST_ENV: ${{ secrets.TEST_ENV }}
+          TEST_ENV_NEW: ${{ secrets.TEST_ENV_NEW }}
+        run: |
+          printf "TEST=%s\nTEST2=%s" $TEST_ENV $TEST_ENV_NEW > .env.production
+          cat .env.production
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
 
       # - name: Build, tag, and push image to Amazon ECR
       #   id: build-image
@@ -50,17 +58,17 @@ jobs:
       #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Install Docker Compose CLI
-        run: |
-         curl -L https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
+      # - name: Install Docker Compose CLI
+      #   run: |
+      #    curl -L https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
 
-      - name: Create an ecs context
-        run: |
-          docker context create ecs ecscontext --from-env 
+      # - name: Create an ecs context
+      #   run: |
+      #     docker context create ecs ecscontext --from-env 
       
-      - name: Generate Amazon ECS task definition
-        run: |
-          docker --context ecscontext compose -f production.yml convert  --format json
+      # - name: Generate Amazon ECS task definition
+      #   run: |
+      #     docker --context ecscontext compose -f production.yml convert  --format json
 
       # - name: Deploy Amazon ECS task definition
       #   uses: aws-actions/amazon-ecs-deploy-task-definition@de0132cf8cdedb79975c6d42b77eb7ea193cf28e
