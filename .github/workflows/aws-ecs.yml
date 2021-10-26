@@ -1,9 +1,10 @@
 name: Deploy to Amazon ECS
 
 on:
-  push:
-    branches:
-      - dev
+  - workflow_dispatch
+  - push:
+      branches:
+        - dev
 
 env:
   AWS_REGION: ap-southeast-1
@@ -68,4 +69,4 @@ jobs:
       - name: Deploy Amazon ECS task definition
         run: |
           docker context create ecs ecscontext --from-env
-          docker --debug --context ecscontext compose ps
+          docker --debug --context ecscontext compose up
