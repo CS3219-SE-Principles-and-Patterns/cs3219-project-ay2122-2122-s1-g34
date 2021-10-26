@@ -11,6 +11,8 @@ env:
   ECR_REPOSITORY: peerprep/api-gateway
   ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-ApigatewayService-Ymx9PonEnpdo
   ECS_CLUSTER: cs3219-project-ay2122-2122-s1-g34
+  ECS_TASK_DEFINITION: .aws/task-definition.json
+
   CONTAINER_NAME: api-gateway
 
 jobs:
@@ -22,10 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Install Docker Compose CLI
-        run: >
-          curl -L https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
@@ -51,22 +49,23 @@ jobs:
       #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
       #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-      
-      # - name: Build, tag, and push image to Amazon ECR
-      #   id: build-image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     IMAGE_TAG: latest
-      #   working-directory: ./api-gateway
-      #   run: |
-      #     # Build a docker container and
-      #     # push it to ECR so that it can
-      #     # be deployed to ECS.
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Deploy Amazon ECS task definition
+      - name: Install Docker Compose CLI
         run: |
-          docker context create ecs ecscontext --from-env
-          docker --debug --context ecscontext compose -f production.yml up
+         curl -L https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
+
+      - name: Create an ecs context
+        run: |
+          docker context create ecs ecscontext
+      
+      - name: Generate Amazon ECS task definition
+        run: |
+          docker --context ecscontext compose -f production.yml convert  --format json
+
+      # - name: Deploy Amazon ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@de0132cf8cdedb79975c6d42b77eb7ea193cf28e
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     service: ${{ env.ECS_SERVICE }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     wait-for-service-stability: true
