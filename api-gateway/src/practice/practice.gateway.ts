@@ -1,4 +1,6 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
@@ -25,5 +27,13 @@ export class PracticeGateway implements OnGatewayConnection {
   @SubscribeMessage("practice:init")
   practiceInit(client: Socket) {
     return this.practiceService.practiceInit(client, this.server);
+  }
+
+  @SubscribeMessage("practice:check-answer")
+  checkAnswer(
+    @MessageBody() answer: string,
+    @ConnectedSocket() client: Socket
+  ) {
+    return this.practiceService.checkAnswer(answer, client, this.server);
   }
 }

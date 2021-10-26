@@ -1,11 +1,6 @@
 import { Notes } from "features/past-attempts/notes.type";
-import { Question } from "features/practice-session/question.interface";
+import { PracticeSession } from "features/practice-session/practice-session.interface";
 
-export interface PastAttempt {
-  id: string;
-  code: string;
-  difficulty: string;
-  peerDisplayName: string;
-  question: Question;
+export interface PastAttempt extends PracticeSession {
   notes: Notes;
 }

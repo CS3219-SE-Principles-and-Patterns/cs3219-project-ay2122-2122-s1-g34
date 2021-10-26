@@ -169,8 +169,8 @@ export default function Dashboard() {
           </Typography>
 
           <Box sx={{ mt: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
+            <Grid container spacing={4}>
+              <Grid item xs={4}>
                 <DashboardCard
                   outlineColor={"purple"}
                   title={"Continue a task"}
@@ -183,17 +183,8 @@ export default function Dashboard() {
                   disabled={!inProgressSession}
                 />
               </Grid>
-              <Grid item xs={3}>
-                <DashboardCard
-                  outlineColor={"violet"}
-                  title={"Check out the Leaderboard"}
-                  subtitle={"Woah who is that?"}
-                  component={RouterLink}
-                  to="/leaderboard"
-                />
-              </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <DashboardCard
                   outlineColor={"blue"}
                   title={"Review past attempts"}
@@ -203,7 +194,7 @@ export default function Dashboard() {
                 />
               </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <DashboardCard
                   outlineColor={"yellow"}
                   title={"Logout"}

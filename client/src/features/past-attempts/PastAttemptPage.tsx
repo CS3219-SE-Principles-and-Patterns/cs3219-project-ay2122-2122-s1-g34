@@ -10,15 +10,6 @@ import SessionContainer from "features/practice-session/SessionContainer";
 
 import PastAttemptHeader from "./PastAttemptHeader";
 
-function parseJson(str: string) {
-  try {
-    const result = JSON.parse(str);
-    return result;
-  } catch {
-    return str;
-  }
-}
-
 export default function PastAttemptPage() {
   const { attemptId } = useParams<{ attemptId: string }>();
 
@@ -39,7 +30,7 @@ export default function PastAttemptPage() {
         notes={data.notes}
         CollaborativeEditorProps={{
           readOnly: true,
-          defaultValue: parseJson(data.code),
+          practiceSession: data,
         }}
       />
     </>
