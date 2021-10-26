@@ -56,7 +56,7 @@ jobs:
 
       - name: Create an ecs context
         run: |
-          docker context create ecs ecscontext
+          docker context create ecs ecscontext --from-env 
       
       - name: Generate Amazon ECS task definition
         run: |
