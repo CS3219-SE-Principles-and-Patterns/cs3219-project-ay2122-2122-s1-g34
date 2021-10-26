@@ -64,6 +64,14 @@ jobs:
         run: |
           docker context create ecs ecscontext --from-env
 
-      - name: Deploy to ECS
+      - name: Generate task definition
         run: |
-          docker --context ecscontext compose -f production.yml up
+          mkdir .aws && docker compose -f production.yml convert --format json > .aws/task-definition.json
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@de0132cf8cdedb79975c6d42b77eb7ea193cf28e
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
