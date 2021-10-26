@@ -80,8 +80,6 @@ services:
     image: nats
     expose:
       - "4222"
-      - "6222"
-      - "8222"
     deploy:
       replicas: 1
 
