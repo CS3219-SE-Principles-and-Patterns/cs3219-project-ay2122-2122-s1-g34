@@ -16,14 +16,14 @@ import { PracticeSession } from "features/practice-session/practice-session.inte
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 export default function Session() {
-  const history = useHistory();
-  const { open } = useSnackbar();
-  const [isLeaving, setIsLeaving] = React.useState(false);
   const [hasSessionEnded, setHasSessionEnded] = React.useState(false);
+  const [isLeaving, setIsLeaving] = React.useState(false);
   const [practiceSession, setPracticeSession] =
     React.useState<PracticeSession>();
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const user = useAppSelector(selectUser);
+  const { open } = useSnackbar();
   const { socket, setSocket } = useSocket();
 
   useEffect(() => {

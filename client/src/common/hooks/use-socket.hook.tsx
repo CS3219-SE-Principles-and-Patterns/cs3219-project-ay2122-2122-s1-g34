@@ -43,7 +43,7 @@ export function useSocket() {
   return React.useContext(Context);
 }
 
-export function useOnSocketDisconnect(onDisconnect: () => void) {
+export function useOnSocketDisconnect(onDisconnect: (reason?: string) => void) {
   const { socket } = useSocket();
 
   React.useEffect(() => {
@@ -69,15 +69,15 @@ export function useOnSocketConnect(onConnect: (client: Socket) => void) {
       };
 
       if (socket.connected) {
+        // socket is already connected, we run the callback once now
         connectedCallback();
-      } else {
-        // socket not connected yet, we wait for connection to run callback
-        socket.on("connect", connectedCallback);
-
-        return () => {
-          socket.off("connect", connectedCallback);
-        };
       }
+
+      socket.on("connect", connectedCallback);
+
+      return () => {
+        socket.off("connect", connectedCallback);
+      };
     }
   }, [socket, onConnect]);
 }

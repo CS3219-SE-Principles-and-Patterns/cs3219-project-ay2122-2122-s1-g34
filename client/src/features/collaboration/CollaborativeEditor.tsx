@@ -1,4 +1,4 @@
-import Editor, { OnMount } from "@monaco-editor/react";
+import Editor from "@monaco-editor/react";
 import { Box, BoxProps, Typography } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import React from "react";
@@ -27,7 +27,9 @@ export default function CollaborativeEditor({
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const { socket } = useSocket();
 
-  const handleEditorDidMount: OnMount = (editor) => {
+  const handleEditorDidMount: (
+    editor: monaco.editor.IStandaloneCodeEditor
+  ) => void = (editor) => {
     editorRef.current = editor;
 
     if (readOnly) {

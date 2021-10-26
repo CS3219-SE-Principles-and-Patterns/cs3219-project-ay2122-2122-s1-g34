@@ -27,18 +27,6 @@ export default function DisconnectedSnackbar({
         setIsOpen(true);
       });
 
-      socket.on("disconnect", (reason) => {
-        if (
-          reason !== "io server disconnect" &&
-          reason !== "io client disconnect" &&
-          user
-        ) {
-          // user has lost connection but not purposefully left the room
-          setDisconnectedUser(user.id);
-          setIsOpen(true);
-        }
-      });
-
       socket.on("practice:peer-joined", () => {
         // peer rejoined session
         setIsOpen(false);
@@ -59,12 +47,7 @@ export default function DisconnectedSnackbar({
         }}
       >
         <Typography sx={{ marginRight: 2 }}>
-          {(user && user.id) === disconnectedUser
-            ? "Your"
-            : `${disconnectedUser}'s`}{" "}
-          connection is unstable.
-          <br />
-          Trying to re-connect...
+          {`${disconnectedUser}'s`} connection is unstable.
         </Typography>
 
         <IconButton
