@@ -8,7 +8,6 @@
 
 # misc
 npm-debug.log
-.env.production
 
 # example
 /quick-start
