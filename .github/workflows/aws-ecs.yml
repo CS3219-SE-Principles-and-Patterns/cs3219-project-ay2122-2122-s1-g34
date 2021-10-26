@@ -8,12 +8,8 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: peerprep/api-gateway
-  ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-ApigatewayService-Ymx9PonEnpdo
   ECS_CLUSTER: cs3219-project-ay2122-2122-s1-g34
-  ECS_TASK_DEFINITION: .aws/task-definition.json
-
-  CONTAINER_NAME: api-gateway
+  IMAGE_TAG: latest
 
 jobs:
   deploy:
@@ -42,16 +38,63 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
+      - name: Build, tag, and push api-gateway to Amazon ECR
+        id: build-api-gateway
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
+          ECR_REPOSITORY: peerprep/api-gateway
+          ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-ApigatewayService-Ymx9PonEnpdo
         working-directory: ./api-gateway
         run: |
-          # Build a docker container and
-          # push it to ECR so that it can
-          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Build, tag, and push client to Amazon ECR
+        id: build-client
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: peerprep/client
+          ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-ClientService-Mwcz4KX7jc74
+        working-directory: ./client
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Build, tag, and push code-runner-service to Amazon ECR
+        id: build-code-runner-service
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: peerprep/code-runner-service
+          ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-CoderunnerserviceService-IcamVFI9jHq0
+        working-directory: ./code-runner-service
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Build, tag, and push collaboration-service to Amazon ECR
+        id: build-collaboration-service
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: peerprep/collaboration-service
+          ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-CollaborationserviceService-kIrt4ET78vUs
+        working-directory: ./collaboration-service
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Build, tag, and push practice-service to Amazon ECR
+        id: build-practice-service
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: peerprep/practice-service
+          ECS_SERVICE: cs3219-project-ay2122-2122-s1-g34-PracticeserviceService-6vp5otWHwqjG
+          IMAGE_TAG: latest
+        working-directory: ./practice-services
+        run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
