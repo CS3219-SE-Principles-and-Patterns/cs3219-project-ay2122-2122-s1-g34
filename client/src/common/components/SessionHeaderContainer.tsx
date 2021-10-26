@@ -1,4 +1,5 @@
 import { Button, Typography, Grid } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 
 import Header from "common/components/Header";
 import { useAppSelector } from "common/hooks/use-redux.hook";
@@ -17,7 +18,7 @@ export default function SessionHeaderContainer({
   peerDisplayName,
 }: SessionHeaderContainerProps) {
   const user = useAppSelector(selectUser);
-  
+
   if (!user) {
     return null;
   }
@@ -77,7 +78,8 @@ export default function SessionHeaderContainer({
           </Grid>
         </Grid>
       </Grid>
-      {!!onLeaveSessionClick && (
+
+      {!!onLeaveSessionClick ? (
         <Button
           variant="contained"
           size="small"
@@ -93,6 +95,24 @@ export default function SessionHeaderContainer({
           onClick={onLeaveSessionClick}
         >
           Leave Session
+        </Button>
+      ) : (
+        <Button
+          variant="contained"
+          size="small"
+          sx={{
+            borderRadius: 10,
+            paddingX: 2,
+            fontSize: 18,
+            fontWeight: "regular",
+            color: "lightGray.main",
+            backgroundColor: "green.main",
+            textTransform: "none",
+          }}
+          component={RouterLink}
+          to={"/past-attempts"}
+        >
+          Go back
         </Button>
       )}
     </Header>
