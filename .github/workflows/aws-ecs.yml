@@ -8,7 +8,6 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1
-  ECS_CLUSTER: cs3219-project-ay2122-2122-s1-g34
   IMAGE_TAG: latest
 
 jobs:
