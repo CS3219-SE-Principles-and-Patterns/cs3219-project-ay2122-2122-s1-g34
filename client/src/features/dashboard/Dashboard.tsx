@@ -88,19 +88,6 @@ export default function Dashboard() {
       <MatchingModal />
       <SignedInHeader />
       <Container maxWidth="lg" disableGutters sx={{ paddingY: 1 }}>
-        <Box sx={{ display: "flex", flex: 1, alignSelf: "flex-start" }}>
-          <Typography fontWeight={"medium"} gutterBottom>
-            Welcome back {userDisplayName}, complete a task to get your{" "}
-            <Typography
-              component="span"
-              fontWeight={"bold"}
-              sx={{ display: "inline" }}
-            >
-              {dayStreak}
-            </Typography>{" "}
-            day streak.
-          </Typography>
-        </Box>
         <Box
           sx={{
             display: "flex",
