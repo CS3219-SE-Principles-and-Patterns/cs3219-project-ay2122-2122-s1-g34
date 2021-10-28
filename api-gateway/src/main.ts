@@ -2,6 +2,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { Transport } from "@nestjs/microservices";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import * as helmet from "helmet";
 
 import { RedisIoAdapter } from "./adapters/redis-io.adapter";
 import { AppModule } from "./app.module";
@@ -11,6 +12,7 @@ async function bootstrap() {
 
   app.enableVersioning();
   app.setGlobalPrefix("api");
+  app.use(helmet());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useWebSocketAdapter(new RedisIoAdapter(app));
 
@@ -27,8 +29,8 @@ async function bootstrap() {
   app.connectMicroservice({
     transport: Transport.NATS,
     options: {
-      servers: ["nats://nats:4222"],
-      queue: "api_gateway_queue",
+      servers: [process.env.NATS_SERVER],
+      queue: process.env.API_GATEWAY_NATS_QUEUE,
     },
   });
   await app.startAllMicroservices();

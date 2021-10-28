@@ -23,7 +23,7 @@ services:
       - 9099:9099
     volumes:
       - ./api-gateway:/app
-    env_file: ./api-gateway/.env
+    env_file: ./.env
 
   collaboration-service:
     restart: always
@@ -32,7 +32,7 @@ services:
     working_dir: /app
     volumes:
       - ./collaboration-service:/app
-    env_file: ./collaboration-service/.env
+    env_file: ./.env
 
   practice-service:
     restart: always
@@ -41,7 +41,7 @@ services:
     working_dir: /app
     volumes:
       - ./practice-service:/app
-    env_file: ./practice-service/.env
+    env_file: ./.env
 
   code-runner-service:
     restart: always
@@ -55,7 +55,7 @@ services:
 
   practice-service-postgres:
     restart: always
-    env_file: ./practice-service/.env
+    env_file: ./.env
     image: postgres:12
     volumes:
       - practice-service-postgres-dev:/var/lib/postgresql/data
