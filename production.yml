@@ -5,16 +5,16 @@ services:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/client
     ports:
       - 80:80
+    depends_on:
+      - "api-gateway"
     x-aws-autoscaling:
       min: 1
       max: 3
       cpu: 75
 
   api-gateway:
-    restart: always
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/api-gateway
-    build: ./api-gateway
-    env_file: ./api-gateway/.env.production
+    env_file: ./.env.production
     depends_on:
       - "nats"
       - "redis"
@@ -25,7 +25,7 @@ services:
 
   collaboration-service:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/collaboration-service
-    env_file: ./collaboration-service/.env.production
+    env_file: ./.env.production
     depends_on:
       - "nats"
     x-aws-autoscaling:
@@ -36,7 +36,7 @@ services:
   practice-service:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/practice-service
     command: sh -c "NODE_ENV=production yarn run typeorm:migrate && NODE_ENV=production yarn run seed && yarn start:prod"
-    env_file: ./practice-service/.env.production
+    env_file: ./.env.production
     depends_on:
       - "nats"
       - "practice-service-postgres"
@@ -47,8 +47,6 @@ services:
 
   code-runner-service:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/code-runner-service
-    environment:
-      NODE_ENV: production
     depends_on:
       - "nats"
     x-aws-autoscaling:
@@ -57,12 +55,10 @@ services:
       cpu: 75
 
   practice-service-postgres:
-    env_file: ./practice-service/.env.production
+    env_file: ./.env.production
     image: postgres:12
     volumes:
       - practice-service-postgres:/var/lib/postgresql/data
-    expose:
-      - "5432"
     deploy:
       replicas: 1
 

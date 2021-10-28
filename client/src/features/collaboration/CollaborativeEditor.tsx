@@ -1,8 +1,7 @@
-import Editor, { OnMount } from "@monaco-editor/react";
-import { LoadingButton } from "@mui/lab";
-import { Box, BoxProps, Typography, TextField } from "@mui/material";
+import Editor from "@monaco-editor/react";
+import { Box, BoxProps, Typography } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { MonacoBinding } from "y-monaco";
 import * as Y from "yjs";
 
@@ -11,68 +10,22 @@ import { useSocket } from "common/hooks/use-socket.hook";
 import RunCodeButton from "features/collaboration/RunCodeButton";
 import { SocketIoProvider } from "features/collaboration/y-socket-io.class";
 import { PracticeSession } from "features/practice-session/practice-session.interface";
-import { useSnackbar } from "features/snackbar/use-snackbar.hook";
-
-function parseJson(str: string) {
-  try {
-    const result = JSON.parse(str);
-    return result;
-  } catch {
-    return str;
-  }
-}
 
 export interface CollaborativeEditorProps extends BoxProps {
-  practiceSession: PracticeSession;
+  defaultValue?: string;
+  practiceSession?: PracticeSession;
   readOnly?: boolean;
 }
 
 export default function CollaborativeEditor({
+  defaultValue,
   practiceSession,
   readOnly,
   sx,
   ...rest
 }: CollaborativeEditorProps) {
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
-  console.log(practiceSession);
   const { socket } = useSocket();
-  const [userAnswer, setUserAnswer] = useState(
-    readOnly ? practiceSession?.question.answer : ""
-  );
-  const [isUserAnswerCorrect, setIsUserAnswerCorrect] = useState(false);
-  const [isCheckingAnswer, setIsCheckingAnswer] = useState(false);
-  const { open } = useSnackbar();
-
-  useEffect(() => {
-    if (socket && !readOnly) {
-      const callback = ({
-        isCorrect,
-        answer,
-      }: {
-        isCorrect: boolean;
-        answer: string;
-      }) => {
-        setIsUserAnswerCorrect(isCorrect);
-        setIsCheckingAnswer(false);
-        setUserAnswer(answer);
-
-        if (isCorrect) {
-          open({ message: "The answer is correct!" });
-        } else {
-          open({
-            message: "The answer is wrong! Please try again!",
-            severity: "error",
-          });
-        }
-      };
-
-      socket.on("practice:check-answer", callback);
-
-      return () => {
-        socket.off("practice:check-answer", callback);
-      };
-    }
-  }, [socket, readOnly, open]);
 
   const handleEditorDidMount: (
     editor: monaco.editor.IStandaloneCodeEditor
@@ -143,71 +96,13 @@ export default function CollaborativeEditor({
         <Typography variant="h6" fontWeight="600">
           Code
         </Typography>
-        <TextField
-          id="user-answer-textfield"
-          variant="outlined"
-          fullWidth
-          type="text"
-          value={userAnswer}
-          onChange={(e) => setUserAnswer(e.target.value)}
-          label="Answer"
-          disabled={readOnly || isCheckingAnswer}
-          sx={{
-            display: "flex",
-            marginX: 14,
-            borderRadius: 8,
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                borderColor: isUserAnswerCorrect ? "green.main" : "violet.main",
-              },
-          }}
-          InputProps={
-            !readOnly
-              ? {
-                  endAdornment: (
-                    <LoadingButton
-                      loading={isCheckingAnswer}
-                      variant="contained"
-                      size="small"
-                      type="submit"
-                      sx={{
-                        borderRadius: 4,
-                        paddingX: 1,
-                        marginLeft: 1,
-                        fontSize: 16,
-                        fontWeight: "regular",
-                        color: "lightGray.main",
-                        backgroundColor: "violet.main",
-                        textTransform: "none",
-                      }}
-                      onClick={checkAnswerIsCorrect}
-                    >
-                      Check
-                    </LoadingButton>
-                  ),
-                }
-              : undefined
-          }
-        />
-
         <RunCodeButton editorRef={editorRef} />
       </Box>
       <Editor
         defaultLanguage="javascript"
         onMount={handleEditorDidMount}
-        defaultValue={parseJson(practiceSession.code)}
+        defaultValue={defaultValue}
       />
     </Box>
   );
-
-  function checkAnswerIsCorrect() {
-    if (socket) {
-      setIsCheckingAnswer(true);
-      try {
-        socket.emit("practice:check-answer", userAnswer);
-      } catch {
-        setIsCheckingAnswer(false);
-      }
-    }
-  }
 }
