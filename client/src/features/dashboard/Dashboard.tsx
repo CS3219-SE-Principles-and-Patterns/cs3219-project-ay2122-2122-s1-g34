@@ -88,19 +88,6 @@ export default function Dashboard() {
       <MatchingModal />
       <SignedInHeader />
       <Container maxWidth="lg" disableGutters sx={{ paddingY: 1 }}>
-        <Box sx={{ display: "flex", flex: 1, alignSelf: "flex-start" }}>
-          <Typography fontWeight={"medium"} gutterBottom>
-            Welcome back {userDisplayName}, complete a task to get your{" "}
-            <Typography
-              component="span"
-              fontWeight={"bold"}
-              sx={{ display: "inline" }}
-            >
-              {dayStreak}
-            </Typography>{" "}
-            day streak.
-          </Typography>
-        </Box>
         <Box
           sx={{
             display: "flex",
@@ -169,8 +156,8 @@ export default function Dashboard() {
           </Typography>
 
           <Box sx={{ mt: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
+            <Grid container spacing={4}>
+              <Grid item xs={4}>
                 <DashboardCard
                   outlineColor={"purple"}
                   title={"Continue a task"}
@@ -183,17 +170,8 @@ export default function Dashboard() {
                   disabled={!inProgressSession}
                 />
               </Grid>
-              <Grid item xs={3}>
-                <DashboardCard
-                  outlineColor={"violet"}
-                  title={"Check out the Leaderboard"}
-                  subtitle={"Woah who is that?"}
-                  component={RouterLink}
-                  to="/leaderboard"
-                />
-              </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <DashboardCard
                   outlineColor={"blue"}
                   title={"Review past attempts"}
@@ -203,7 +181,7 @@ export default function Dashboard() {
                 />
               </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <DashboardCard
                   outlineColor={"yellow"}
                   title={"Logout"}

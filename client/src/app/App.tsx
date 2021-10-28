@@ -7,7 +7,6 @@ import PrivateRoute from "features/auth/PrivateRoute";
 import Register from "features/auth/Register";
 import { useUser } from "features/auth/use-user.hook";
 import Dashboard from "features/dashboard/Dashboard";
-import Leaderboard from "features/leaderboard/Leaderboard";
 import PastAttemptsPage from "features/past-attempts/PastAttemptsPage";
 import Session from "features/practice-session/Session";
 import AppSnackbar from "features/snackbar/AppSnackbar";
@@ -35,9 +34,6 @@ export default function App() {
 
           <PrivateRoute path="/past-attempts">
             <PastAttemptsPage />
-          </PrivateRoute>
-          <PrivateRoute path="/leaderboard">
-            <Leaderboard />
           </PrivateRoute>
           <PrivateRoute path="/session">
             <Session />
