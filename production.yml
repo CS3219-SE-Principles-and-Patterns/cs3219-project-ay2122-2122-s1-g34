@@ -8,8 +8,8 @@ services:
     depends_on:
       - "api-gateway"
     x-aws-autoscaling:
-      min: 1
-      max: 3
+      min: 0.25
+      max: 2
       cpu: 75
 
   api-gateway:
@@ -19,8 +19,8 @@ services:
       - "nats"
       - "redis"
     x-aws-autoscaling:
-      min: 1
-      max: 3
+      min: 0.25
+      max: 2
       cpu: 75
 
   collaboration-service:
@@ -29,8 +29,8 @@ services:
     depends_on:
       - "nats"
     x-aws-autoscaling:
-      min: 1
-      max: 3
+      min: 0.25
+      max: 2
       cpu: 75
 
   practice-service:
@@ -41,8 +41,8 @@ services:
       - "nats"
       - "practice-service-postgres"
     x-aws-autoscaling:
-      min: 1
-      max: 3
+      min: 0.25
+      max: 2
       cpu: 75
 
   code-runner-service:
@@ -50,8 +50,8 @@ services:
     depends_on:
       - "nats"
     x-aws-autoscaling:
-      min: 1
-      max: 3
+      min: 0.25
+      max: 2
       cpu: 75
 
   practice-service-postgres:
