@@ -7,10 +7,11 @@ services:
       - 80:80
     depends_on:
       - "api-gateway"
-    x-aws-autoscaling:
-      min: 0.25
-      max: 2
-      cpu: 75
+    deploy:
+      x-aws-autoscaling:
+        min: 0.25
+        max: 2
+        cpu: 75
 
   api-gateway:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/api-gateway
@@ -18,20 +19,22 @@ services:
     depends_on:
       - "nats"
       - "redis"
-    x-aws-autoscaling:
-      min: 0.25
-      max: 2
-      cpu: 75
+    deploy:
+      x-aws-autoscaling:
+        min: 0.25
+        max: 2
+        cpu: 75
 
   collaboration-service:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/collaboration-service
     env_file: ./.env.production
     depends_on:
       - "nats"
-    x-aws-autoscaling:
-      min: 0.25
-      max: 2
-      cpu: 75
+    deploy:
+      x-aws-autoscaling:
+        min: 0.25
+        max: 2
+        cpu: 75
 
   practice-service:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/practice-service
@@ -40,19 +43,21 @@ services:
     depends_on:
       - "nats"
       - "practice-service-postgres"
-    x-aws-autoscaling:
-      min: 0.25
-      max: 2
-      cpu: 75
+    deploy:
+      x-aws-autoscaling:
+        min: 0.25
+        max: 2
+        cpu: 75
 
   code-runner-service:
     image: 776739177330.dkr.ecr.ap-southeast-1.amazonaws.com/peerprep/code-runner-service
     depends_on:
       - "nats"
-    x-aws-autoscaling:
-      min: 0.25
-      max: 2
-      cpu: 75
+    deploy:
+      x-aws-autoscaling:
+        min: 0.25
+        max: 2
+        cpu: 75
 
   practice-service-postgres:
     env_file: ./.env.production
