@@ -44,10 +44,6 @@ export default function Dashboard() {
     setIsLoading(false);
   });
 
-  // TODO: replace dummy data
-  const dayStreak = "3rd";
-  const userDisplayName = user ? user.displayName : "";
-
   React.useEffect(() => {
     if (socket) {
       const callback = () => {
