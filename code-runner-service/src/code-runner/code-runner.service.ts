@@ -1,19 +1,19 @@
 import { Injectable } from "@nestjs/common";
-import { fork } from "child_process";
+import * as child from "child_process";
 import { join } from "path";
 
 @Injectable()
 export class CodeRunnerService {
   runCode(code: string) {
     return new Promise((resolve) => {
-      const child = fork(join(__dirname, "runner.js"));
-      child.send(code);
+      const process = child.fork(join(__dirname, "runner.js"));
+      process.send(code);
 
-      child.on("message", (message) => {
+      process.on("message", (message) => {
         resolve(message);
       });
 
-      child.on("exit", () => {
+      process.on("exit", () => {
         resolve("An unspecified error has occurred.");
       });
     });
