@@ -8,7 +8,14 @@ import { RunCodeDto } from "./dto/run-code.dto";
 export class CodeRunnerService {
   constructor(@Inject("CODE_RUNNER_SERVICE") private natsClient: ClientProxy) {}
 
-  runCode(runCodeDto: RunCodeDto) {
-    return firstValueFrom(this.natsClient.send("runCode", runCodeDto.code));
+  async runCode(runCodeDto: RunCodeDto) {
+    try {
+      const output = await firstValueFrom(
+        this.natsClient.send("runCode", runCodeDto.code)
+      );
+      return output;
+    } catch {
+      return undefined;
+    }
   }
 }
