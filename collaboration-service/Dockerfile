@@ -3,10 +3,16 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
+ENV NODE_ENV production
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S peerprep -u 1001
+
 COPY package.json yarn.lock ./
 RUN yarn install
 COPY . .
-ENV NODE_ENV production
 RUN yarn build
+
+USER peerprep
 
 CMD ["yarn", "start:prod"]

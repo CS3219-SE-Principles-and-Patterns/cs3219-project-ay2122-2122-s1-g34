@@ -1,26 +1,21 @@
 import { Injectable } from "@nestjs/common";
-import { VM } from "vm2";
+import { fork } from "child_process";
+import { join } from "path";
 
 @Injectable()
 export class CodeRunnerService {
   runCode(code: string) {
-    const timeout = 1000 * 10; // 10 second timeout
-    const vm = new VM({
-      timeout,
-      eval: false,
-      wasm: false,
-      fixAsync: true,
-    });
+    return new Promise((resolve) => {
+      const child = fork(join(__dirname, "runner.js"));
+      child.send(code);
 
-    try {
-      const result = vm.run(code);
-      if (result === undefined) {
-        return "undefined";
-      } else {
-        return JSON.stringify(result, null, 2);
-      }
-    } catch (e) {
-      return e.message;
-    }
+      child.on("message", (message) => {
+        resolve(message);
+      });
+
+      child.on("exit", () => {
+        resolve("An unspecified error has occurred.");
+      });
+    });
   }
 }
