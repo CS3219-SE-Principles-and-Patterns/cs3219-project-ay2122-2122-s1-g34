@@ -87,7 +87,6 @@ export default function RunCodeButton({
                 { headers: { token: user.token } }
               );
 
-              console.log(response.data);
               setRunResult(JSON.stringify(response.data));
             } finally {
               setLoading(false);
