@@ -16,15 +16,13 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useWebSocketAdapter(new RedisIoAdapter(app));
 
-  if (process.env.NODE_ENV === "development") {
-    // setup swagger
-    const config = new DocumentBuilder()
-      .setTitle("PeerPrep")
-      .setVersion("1.0")
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup("swagger", app, document);
-  }
+  // setup swagger
+  const config = new DocumentBuilder()
+    .setTitle("PeerPrep")
+    .setVersion("1.0")
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("swagger", app, document);
 
   app.connectMicroservice({
     transport: Transport.NATS,
@@ -36,6 +34,7 @@ async function bootstrap() {
   await app.startAllMicroservices();
 
   await app.listen(process.env.PORT || 5000);
+
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
