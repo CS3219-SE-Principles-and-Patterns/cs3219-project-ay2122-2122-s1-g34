@@ -1,4 +1,5 @@
 # cs3219-project-ay2122-2122-s1-g34
+App url: [https://niftnift.com](https://niftnift.com)
 
 ## Setup
 1. Install docker and `docker-compose`
