@@ -93,6 +93,10 @@ export class PracticeController {
 
   @Put(":sessionId")
   @ApiOperation({ summary: "Update notes" })
+  @ApiResponse({
+    status: 200,
+    description: "Successfully updated session note",
+  })
   @UseGuards(AuthGuard)
   async updateSessionNote(
     @User() user,
