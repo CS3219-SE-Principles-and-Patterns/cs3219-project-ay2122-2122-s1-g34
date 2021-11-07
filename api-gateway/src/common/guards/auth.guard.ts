@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
+  ForbiddenException,
 } from "@nestjs/common";
 
 import { FirebaseService } from "../../firebase/firebase.service";
@@ -15,6 +16,10 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = request?.headers?.token;
 
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const user = await this.firebaseService.verifyIdToken(token);
 
@@ -24,7 +29,7 @@ export class AuthGuard implements CanActivate {
       // users must have display name and email address
       return !!user && !!user.name && !!user.email;
     } catch (error) {
-      throw new UnauthorizedException();
+      throw new ForbiddenException();
     }
   }
 }

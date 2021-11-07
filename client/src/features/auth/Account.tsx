@@ -1,18 +1,15 @@
-import { LoadingButton } from "@mui/lab";
 import { Box, Container, Grid, Typography, Button } from "@mui/material";
-import { updateEmail, updateProfile } from "firebase/auth";
 import { useFormik } from "formik";
 import React from "react";
 import * as yup from "yup";
 
 import TextInput from "common/components/TextInput";
-import { useAppDispatch } from "common/hooks/use-redux.hook";
-import { auth } from "common/utils/firebase.util";
+import { useAppSelector } from "common/hooks/use-redux.hook";
 
 import ChangePasswordDialog from "features/auth/ChangePasswordDialog";
+import SaveInformationDialog from "features/auth/SaveInformationDialog";
 import SignedInHeader from "features/auth/SignedInHeader";
-import { reload } from "features/auth/user.slice";
-import { useSnackbar } from "features/snackbar/use-snackbar.hook";
+import { selectUser } from "features/auth/user.slice";
 
 const validationSchema = yup.object({
   displayName: yup.string().required("Display name is required"),
@@ -24,9 +21,8 @@ const validationSchema = yup.object({
 
 export default function Account() {
   const [isChangingPassword, setIsChangingPassword] = React.useState(false);
-  const dispatch = useAppDispatch();
-  const user = auth.currentUser;
-  const { open } = useSnackbar();
+  const [isSaving, setIsSaving] = React.useState(false);
+  const user = useAppSelector(selectUser);
 
   const formik = useFormik({
     initialValues: {
@@ -34,41 +30,25 @@ export default function Account() {
       email: user ? user.email ?? "" : "",
     },
     validationSchema: validationSchema,
-    onSubmit: async (values, { setFieldError }) => {
-      try {
-        if (user) {
-          await updateEmail(user, values.email);
-          await updateProfile(user, { displayName: values.displayName });
-          await dispatch(reload());
-          open({
-            message: "Update successful!",
-          });
-        } else {
-          console.error("User is not logged in");
-        }
-      } catch (e: any) {
-        if (
-          e?.response?.data?.message &&
-          typeof e?.response?.data?.message === "object"
-        ) {
-          Object.entries(e.response.data.message).forEach(
-            ([property, value]) => {
-              setFieldError(property, value as string);
-            }
-          );
-        } else {
-          open({
-            message: "An unspecified error has occurred. Please try again.",
-            severity: "error",
-          });
-        }
-      }
+    onSubmit: () => {
+      setIsSaving(true);
     },
   });
 
   return (
     <>
       <SignedInHeader />
+      <SaveInformationDialog
+        fullWidth
+        keepMounted={false}
+        handleClose={() => {
+          setIsSaving(false);
+        }}
+        open={isSaving}
+        email={formik.values.email}
+        displayName={formik.values.displayName}
+        setAccountFieldError={formik.setFieldError}
+      />
       <ChangePasswordDialog
         open={isChangingPassword}
         handleClose={() => {
@@ -109,7 +89,6 @@ export default function Account() {
                 helperText={
                   formik.touched.displayName && formik.errors.displayName
                 }
-                disabled={formik.isSubmitting}
               />
             </Grid>
 
@@ -124,7 +103,6 @@ export default function Account() {
                 onChange={formik.handleChange}
                 error={formik.touched.email && Boolean(formik.errors.email)}
                 helperText={formik.touched.email && formik.errors.email}
-                disabled={formik.isSubmitting}
               />
             </Grid>
           </Grid>
@@ -143,7 +121,7 @@ export default function Account() {
             >
               Change password
             </Button>
-            <LoadingButton
+            <Button
               variant="contained"
               size="small"
               type="submit"
@@ -157,10 +135,9 @@ export default function Account() {
                 backgroundColor: "green.main",
                 textTransform: "none",
               }}
-              loading={formik.isSubmitting}
             >
               Save
-            </LoadingButton>
+            </Button>
           </Box>
         </Box>
       </Container>

@@ -8,8 +8,9 @@ import { CollaborationService } from "src/collaboration/collaboration.service";
 
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
+import { PracticeDto } from "./dto/practice.dto";
+import { SessionDto } from "./dto/session.dto";
 import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
-import { Session } from "./interfaces/session.interface";
 
 @Injectable()
 export class PracticeService {
@@ -57,7 +58,10 @@ export class PracticeService {
     }
   }
 
-  private async withPeerDisplayName(session: Session, callerUserId: string) {
+  private async withPeerDisplayName(
+    session: SessionDto,
+    callerUserId: string
+  ): Promise<PracticeDto> {
     const peerId = session.allowedUserIds.find(
       (userId) => userId !== callerUserId
     );
@@ -178,8 +182,8 @@ export class PracticeService {
     }
   }
 
-  async findAll(user: admin.auth.DecodedIdToken) {
-    const sessions = await firstValueFrom<Session[]>(
+  async findAll(user: admin.auth.DecodedIdToken): Promise<PracticeDto[]> {
+    const sessions = await firstValueFrom<SessionDto[]>(
       this.natsClient.send("findAllClosedSessions", user.uid)
     );
 
@@ -194,7 +198,7 @@ export class PracticeService {
   }
 
   async findOne(user: admin.auth.DecodedIdToken, id: string) {
-    const session = await firstValueFrom<Session>(
+    const session = await firstValueFrom<SessionDto>(
       this.natsClient.send("findOneClosedSession", { userId: user.uid, id })
     );
 
@@ -203,7 +207,7 @@ export class PracticeService {
 
   async findOneInProgressSessionByUser(user: admin.auth.DecodedIdToken) {
     try {
-      const session = await firstValueFrom<Session>(
+      const session = await firstValueFrom<SessionDto>(
         this.natsClient.send("findOneInProgressSessionByUser", user.uid)
       );
       return session;

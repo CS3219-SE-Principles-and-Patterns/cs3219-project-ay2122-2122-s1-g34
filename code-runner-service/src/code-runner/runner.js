@@ -13,7 +13,7 @@ process.on("message", (code) => {
     fixAsync: true,
   });
   const result = vm.run(code);
-  
-  process.send(result);
+
+  process.send(result ?? "");
   process.exit(0);
 });
