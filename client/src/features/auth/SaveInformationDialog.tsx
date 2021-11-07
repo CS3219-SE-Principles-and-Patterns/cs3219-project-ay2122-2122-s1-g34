@@ -76,21 +76,14 @@ export default function SaveInformationDialog({
       } catch (e: any) {
         if (e.code === "auth/wrong-password") {
           setFieldError("currentPassword", "Current password is invalid!");
-        } else if (
-          e?.response?.data?.message &&
-          typeof e?.response?.data?.message === "object"
-        ) {
-          Object.entries(e.response.data.message).forEach(
-            ([property, value]) => {
-              setAccountFieldError(property, value as string);
-            }
-          );
-        } else {
-          open({
-            severity: "error",
-            message: "An unspecified error has occurred. Please try again",
-          });
+        } else if (e.code === "auth/email-already-in-use") {
+          setAccountFieldError("email", "Email is already in use");
+          handleClose();
         }
+        open({
+          severity: "error",
+          message: "An error has occurred. Please try again",
+        });
       }
     },
   });
