@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum } from "class-validator";
 
 export enum Difficulty {
@@ -7,6 +8,7 @@ export enum Difficulty {
 }
 
 export class JoinSessionDto {
+  @ApiProperty({ description: "Difficulty level", enum: Difficulty })
   @IsEnum(Difficulty)
   readonly difficulty: Difficulty;
 }
