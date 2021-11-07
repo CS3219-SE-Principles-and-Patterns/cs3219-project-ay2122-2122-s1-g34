@@ -66,9 +66,6 @@ export default function SaveInformationDialog({
           open({
             message: "Update successful!",
           });
-          open({
-            message: "Password successfully changed. Please login again.",
-          });
           dispatch(logout());
         } else {
           console.error(
