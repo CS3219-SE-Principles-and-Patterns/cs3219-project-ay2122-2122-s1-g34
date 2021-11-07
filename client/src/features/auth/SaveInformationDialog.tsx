@@ -17,7 +17,6 @@ import { useAppDispatch } from "common/hooks/use-redux.hook";
 import { auth } from "common/utils/firebase.util";
 
 import { reload } from "features/auth/user.slice";
-import { logout } from "features/auth/user.slice";
 import { useSnackbar } from "features/snackbar/use-snackbar.hook";
 
 const PasswordSchema = yup.object().shape({
@@ -66,7 +65,7 @@ export default function SaveInformationDialog({
           open({
             message: "Update successful!",
           });
-          dispatch(logout());
+          handleClose();
         } else {
           console.error(
             "User is not logged in or does not have an email address"
