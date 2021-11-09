@@ -57,7 +57,7 @@ export class PracticeController {
     description: "Successfully retrieved all past attempts",
     type: [PracticeDto],
   })
-  @ApiOperation({ summary: "Retrieved all past attempts" })
+  @ApiOperation({ summary: "Retrieve all past attempts" })
   @UseGuards(AuthGuard)
   findAll(@User() user) {
     return this.practiceService.findAll(user);
@@ -69,13 +69,13 @@ export class PracticeController {
     description: "Successfully retrieved all past attempts",
     type: [PracticeDto],
   })
-  @ApiOperation({ summary: "Retrieved all past attempts" })
+  @ApiOperation({ summary: "Find session that user is " })
   @UseGuards(AuthGuard)
   findOneInProgressSessionByUser(@User() user) {
     return this.practiceService.findOneInProgressSessionByUser(user);
   }
 
-  @Get(":userId")
+  @Get(":sessionId")
   @ApiResponse({
     status: 200,
     description: "Successfully found a session that the user is in",
@@ -85,10 +85,10 @@ export class PracticeController {
     status: 404,
     description: "User is not in any session",
   })
-  @ApiOperation({ summary: "Find session that user is in" })
+  @ApiOperation({ summary: "Retrieve a single past attempt" })
   @UseGuards(AuthGuard)
-  findOne(@User() user, @Param("userId") userId: string) {
-    return this.practiceService.findOne(user, userId);
+  findOne(@User() user, @Param("sessionId") sessionId: string) {
+    return this.practiceService.findOne(user, sessionId);
   }
 
   @Put(":sessionId")
