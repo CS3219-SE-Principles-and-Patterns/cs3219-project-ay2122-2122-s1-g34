@@ -13,7 +13,7 @@ import { AuthGuard } from "src/common/guards/auth.guard";
 
 import { User } from "../common/decorators/user.decorator";
 import { JoinSessionDto } from "./dto/join-session.dto";
-import { PracticeDto } from "./dto/practice.dto";
+import { RedactedSessionDto } from "./dto/session.dto";
 import { SessionDto } from "./dto/session.dto";
 import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
 import { PracticeGateway } from "./practice.gateway";
@@ -55,7 +55,7 @@ export class PracticeController {
   @ApiResponse({
     status: 200,
     description: "Successfully retrieved all past attempts",
-    type: [PracticeDto],
+    type: [RedactedSessionDto],
   })
   @ApiOperation({ summary: "Retrieve all past attempts" })
   @UseGuards(AuthGuard)
@@ -67,7 +67,7 @@ export class PracticeController {
   @ApiResponse({
     status: 200,
     description: "Successfully retrieved all past attempts",
-    type: [PracticeDto],
+    type: [RedactedSessionDto],
   })
   @ApiOperation({ summary: "Find session that user is " })
   @UseGuards(AuthGuard)

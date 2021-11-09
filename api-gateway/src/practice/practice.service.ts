@@ -8,7 +8,7 @@ import { CollaborationService } from "src/collaboration/collaboration.service";
 
 import { FirebaseService } from "../firebase/firebase.service";
 import { JoinSessionDto } from "./dto/join-session.dto";
-import { PracticeDto } from "./dto/practice.dto";
+import { RedactedSessionDto } from "./dto/session.dto";
 import { SessionDto } from "./dto/session.dto";
 import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
 
@@ -59,9 +59,9 @@ export class PracticeService {
   }
 
   private async withPeerDisplayName(
-    session: SessionDto,
+    session: SessionDto & { allowedUserIds: string[] },
     callerUserId: string
-  ): Promise<PracticeDto> {
+  ): Promise<SessionDto | RedactedSessionDto> {
     const peerId = session.allowedUserIds.find(
       (userId) => userId !== callerUserId
     );
@@ -182,8 +182,10 @@ export class PracticeService {
     }
   }
 
-  async findAll(user: admin.auth.DecodedIdToken): Promise<PracticeDto[]> {
-    const sessions = await firstValueFrom<SessionDto[]>(
+  async findAll(
+    user: admin.auth.DecodedIdToken
+  ): Promise<RedactedSessionDto[]> {
+    const sessions = await firstValueFrom(
       this.natsClient.send("findAllClosedSessions", user.uid)
     );
 
@@ -192,13 +194,15 @@ export class PracticeService {
       this.withPeerDisplayName(practice, user.uid)
     );
 
-    const resolved = await Promise.all(sessionsWithDisplayName);
+    const resolved: RedactedSessionDto[] = await Promise.all(
+      sessionsWithDisplayName
+    );
 
     return resolved;
   }
 
   async findOne(user: admin.auth.DecodedIdToken, id: string) {
-    const session = await firstValueFrom<SessionDto>(
+    const session = await firstValueFrom(
       this.natsClient.send("findOneClosedSession", { userId: user.uid, id })
     );
 
