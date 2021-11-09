@@ -61,6 +61,7 @@ export default function SessionContainer({
           display: "flex",
           flex: 1,
           minHeight: "620px",
+          maxHeight: "620px",
         }}
       >
         <CollaborativeEditor
