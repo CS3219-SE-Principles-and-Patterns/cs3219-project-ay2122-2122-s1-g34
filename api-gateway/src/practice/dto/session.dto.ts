@@ -1,14 +1,16 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, OmitType } from "@nestjs/swagger";
 
 export class Note {
   @ApiProperty()
   note: string;
 }
 
-export class Question {
+export class RedactedQuestion {
   @ApiProperty()
   title: string;
+}
 
+export class Question extends RedactedQuestion {
   @ApiProperty()
   questionHtml: string;
 
@@ -19,19 +21,26 @@ export class Question {
   notes: Note[];
 }
 
-export class SessionDto {
+export class RedactedSessionDto {
   @ApiProperty()
   id: string;
-  
-  @ApiProperty()
-  allowedUserIds: string[];
-  
+
   @ApiProperty()
   difficulty: string;
-  
+
+  @ApiProperty()
+  peerDisplayName: string;
+
+  @ApiProperty()
+  question: RedactedQuestion;
+}
+
+export class SessionDto extends OmitType(RedactedSessionDto, [
+  "question",
+] as const) {
   @ApiProperty()
   code: string;
-  
+
   @ApiProperty()
   question: Question;
 }

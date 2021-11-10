@@ -13,7 +13,7 @@ import { AuthGuard } from "src/common/guards/auth.guard";
 
 import { User } from "../common/decorators/user.decorator";
 import { JoinSessionDto } from "./dto/join-session.dto";
-import { PracticeDto } from "./dto/practice.dto";
+import { RedactedSessionDto } from "./dto/session.dto";
 import { SessionDto } from "./dto/session.dto";
 import { UpdateSessionNoteDto } from "./dto/update-session-note.dto";
 import { PracticeGateway } from "./practice.gateway";
@@ -55,9 +55,9 @@ export class PracticeController {
   @ApiResponse({
     status: 200,
     description: "Successfully retrieved all past attempts",
-    type: [PracticeDto],
+    type: [RedactedSessionDto],
   })
-  @ApiOperation({ summary: "Retrieved all past attempts" })
+  @ApiOperation({ summary: "Retrieve all past attempts" })
   @UseGuards(AuthGuard)
   findAll(@User() user) {
     return this.practiceService.findAll(user);
@@ -67,15 +67,15 @@ export class PracticeController {
   @ApiResponse({
     status: 200,
     description: "Successfully retrieved all past attempts",
-    type: [PracticeDto],
+    type: [RedactedSessionDto],
   })
-  @ApiOperation({ summary: "Retrieved all past attempts" })
+  @ApiOperation({ summary: "Find session that user is " })
   @UseGuards(AuthGuard)
   findOneInProgressSessionByUser(@User() user) {
     return this.practiceService.findOneInProgressSessionByUser(user);
   }
 
-  @Get(":userId")
+  @Get(":sessionId")
   @ApiResponse({
     status: 200,
     description: "Successfully found a session that the user is in",
@@ -85,10 +85,10 @@ export class PracticeController {
     status: 404,
     description: "User is not in any session",
   })
-  @ApiOperation({ summary: "Find session that user is in" })
+  @ApiOperation({ summary: "Retrieve a single past attempt" })
   @UseGuards(AuthGuard)
-  findOne(@User() user, @Param("userId") userId: string) {
-    return this.practiceService.findOne(user, userId);
+  findOne(@User() user, @Param("sessionId") sessionId: string) {
+    return this.practiceService.findOne(user, sessionId);
   }
 
   @Put(":sessionId")
