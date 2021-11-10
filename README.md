@@ -8,6 +8,8 @@ App url: [https://niftnift.com](https://niftnift.com)
 1. API gateway runs on `localhost:5000` by default
 1. User management portal for dev can be accessed at [http://localhost:9098/auth](http://localhost:9098/auth)
 
+Note: It takes ~10GB of memory to run all containers at once. If you encounter any weird docker errors, odds are, your machine is running out of memory.
+
 ## How to install npm packages
 1. To install additional node modules to the frontend, first run the command below to access the container shell
 
