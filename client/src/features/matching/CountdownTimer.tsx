@@ -1,6 +1,13 @@
 import { Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 
+import {
+  CLEAR_INTERVAL,
+  INTERVAL_TIMEOUT,
+  SET_INTERVAL,
+  timerWorkerScript,
+} from "common/utils/timer-worker-script.util";
+
 export default function CountdownTimer({
   timeAllowed,
   callbackOnTimeout,
@@ -11,23 +18,41 @@ export default function CountdownTimer({
   hasTimeout: boolean;
 }) {
   const [remainingTime, setRemainingTime] = useState(timeAllowed);
-  const timeout = useRef<number | undefined>(undefined);
+  const timerWorker = useRef<Worker>(new Worker(timerWorkerScript));
 
   useEffect(() => {
-    window.clearInterval(timeout.current);
-    timeout.current = window.setInterval(() => {
-      if (!remainingTime) {
-        window.clearInterval(timeout.current);
-        callbackOnTimeout();
-        return false;
-      }
-      setRemainingTime(remainingTime - 1);
-    }, 1000);
+    timerWorker.current.postMessage({
+      id: CLEAR_INTERVAL,
+    });
 
-    return () => {
-      window.clearInterval(timeout.current);
+    let remainingTimeVar = timeAllowed;
+    timerWorker.current.onmessage = (response) => {
+      if (response.data.id === INTERVAL_TIMEOUT) {
+        if (remainingTimeVar <= 0) {
+          timerWorker.current.postMessage({
+            id: CLEAR_INTERVAL,
+          });
+          callbackOnTimeout();
+        }
+        setRemainingTime((remainingTime) => remainingTime - 1);
+        remainingTimeVar--;
+      }
     };
-  }, [callbackOnTimeout, remainingTime]);
+    timerWorker.current.postMessage({
+      id: SET_INTERVAL,
+      timeMs: 1000,
+    });
+
+    const timerWorkerReference = timerWorker.current;
+    return () => {
+      timerWorkerReference.postMessage({
+        id: CLEAR_INTERVAL,
+      });
+    };
+
+    // we do not want the useEffect to re-run after initial mount as this can lead to weird behaviors
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Typography fontWeight={"600"} variant="h4" sx={{ marginTop: 6 }}>
