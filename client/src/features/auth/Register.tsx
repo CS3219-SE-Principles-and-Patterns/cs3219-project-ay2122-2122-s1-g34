@@ -1,9 +1,9 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Container, Grid, Typography, Button, Link } from "@mui/material";
+import { Box, Container, Grid, Typography, Button } from "@mui/material";
 import axios from "axios";
 import { signInWithCustomToken } from "firebase/auth";
 import { useFormik } from "formik";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link as RouterLink } from "react-router-dom";
 import * as yup from "yup";
 
 import Header from "common/components/Header";
@@ -102,6 +102,8 @@ export default function Register() {
           <Button
             variant="contained"
             size="small"
+            component={RouterLink}
+            to="/login"
             sx={{
               borderRadius: 40,
               marginLeft: 3,
@@ -229,11 +231,6 @@ export default function Register() {
               Sign Up
             </LoadingButton>
           </Box>
-          <Typography fontSize={14}>
-            By clicking the button above, you agree to our{" "}
-            <Link href="#">Terms and Conditions</Link> and{" "}
-            <Link href="#">Privacy Policy</Link>.
-          </Typography>
         </Box>
       </Container>
     </>
